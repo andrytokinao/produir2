@@ -5595,11 +5595,11 @@
     const val = checked ? checked.value : null;
     const enyBlock  = document.getElementById('tahiry-eny');
     const tsiaBlock = document.getElementById('tahiry-tsia');
-    if (enyBlock)  enyBlock.style.display  = (val === 'eny')  ? '' : 'none';
-    if (tsiaBlock) tsiaBlock.style.display = (val === 'tsia') ? '' : 'none';
-    if (val !== 'eny' && enyBlock)
+    if (enyBlock)  enyBlock.style.display  = (val === 'Eny')  ? '' : 'none';
+    if (tsiaBlock) tsiaBlock.style.display = (val === 'Tsia') ? '' : 'none';
+    if (val !== 'Eny' && enyBlock)
       enyBlock.querySelectorAll('input').forEach(el => { if (el.type === 'radio') el.checked = false; else el.value = ''; });
-    if (val !== 'tsia' && tsiaBlock)
+    if (val !== 'Tsia' && tsiaBlock)
       tsiaBlock.querySelectorAll('input[type="text"], textarea').forEach(el => { el.value = ''; });
   }
   document.querySelectorAll('input[name="tahiry"]').forEach(r => r.addEventListener('change', toggleTahiry));
