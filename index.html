@@ -1619,9 +1619,12 @@
           <input type="text" name="laharana_fisy" placeholder="Laharan'ny fisy" required>
         </div>
       </div>
-      <div style="margin-top: 16px; padding-top: 16px; border-top: 1px dashed #d1d5db;">
+      <div style="margin-top: 16px; padding-top: 16px; border-top: 1px dashed #d1d5db; display: flex; flex-wrap: wrap; gap: 10px;">
+        <button type="button" class="load-json-button" style="background: linear-gradient(135deg, #059669, #10b981); flex: 1; min-width: 200px;" onclick="startNewRecord()">
+          <span style="font-size: 18px;">➕</span> Fanadihadiana vaovao
+        </button>
         <input type="file" id="jsonFileInput" accept=".json" style="display: none;" onchange="loadFromJSON(event)">
-        <button type="button" class="load-json-button" onclick="document.getElementById('jsonFileInput').click()">
+        <button type="button" class="load-json-button" style="flex: 1; min-width: 200px;" onclick="document.getElementById('jsonFileInput').click()">
           <span style="font-size: 18px;">📂</span> Hanokatra fichier JSON (Hampiditra angona teo aloha)
         </button>
       </div>
@@ -1655,8 +1658,8 @@
         <div class="field">
           <label><span class="q-num">4</span>Fananahana</label>
           <div class="choices">
-            <label class="choice-item"><input type="radio" name="fananahana" value="lahy"> Lahy</label>
-            <label class="choice-item"><input type="radio" name="fananahana" value="vavy"> Vavy</label>
+            <label class="choice-item"><input type="radio" name="fananahana" value="Lahy"> Lahy</label>
+            <label class="choice-item"><input type="radio" name="fananahana" value="Vavy"> Vavy</label>
           </div>
         </div>
       </div>
@@ -1664,10 +1667,10 @@
       <div class="field">
         <label><span class="q-num">5</span>Fanambadiana</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="fanambadiana" value="manambady"> Manambady</label>
-          <label class="choice-item"><input type="radio" name="fanambadiana" value="tsy_manambady"> Tsy manambady</label>
-          <label class="choice-item"><input type="radio" name="fanambadiana" value="nisara_bady"> Nisara-bady</label>
-          <label class="choice-item"><input type="radio" name="fanambadiana" value="maty_vady"> Maty vady</label>
+          <label class="choice-item"><input type="radio" name="fanambadiana" value="Manambady"> Manambady</label>
+          <label class="choice-item"><input type="radio" name="fanambadiana" value="Tsy manambady"> Tsy manambady</label>
+          <label class="choice-item"><input type="radio" name="fanambadiana" value="Nisara-bady"> Nisara-bady</label>
+          <label class="choice-item"><input type="radio" name="fanambadiana" value="Maty vady"> Maty vady</label>
         </div>
       </div>
 
@@ -1699,45 +1702,47 @@
         </div>
       </div>
 
-      <div class="section-divider"></div>
-      <p style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:14px">Momban'ny Vady</p>
+      <div id="vady-section" style="display:none;">
+        <div class="section-divider"></div>
+        <p style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:14px">Momban'ny Vady</p>
 
-      <div class="field">
-        <label><span class="q-num">9</span>Anarana sy fanampin'anarana ny vady</label>
-        <input type="text" name="anarana_vady" placeholder="Anarana sy fanampiny">
-      </div>
+        <div class="field">
+          <label><span class="q-num">9</span>Anarana sy fanampin'anarana ny vady</label>
+          <input type="text" name="anarana_vady" placeholder="Anarana sy fanampiny">
+        </div>
 
-      <div class="inline-group">
-        <div class="field">
-          <label><span class="q-num">10</span>Taona</label>
-          <input type="number" name="taona_vady" placeholder="Taona" min="1" max="120">
+        <div class="inline-group">
+          <div class="field">
+            <label><span class="q-num">10</span>Taona</label>
+            <input type="number" name="taona_vady" placeholder="Taona" min="1" max="120">
+          </div>
+          <div class="field">
+            <label><span class="q-num">11</span>Laharana kara-panondro</label>
+            <input type="text" name="kp_vady" id="kp_vady" placeholder="XXX XXX XXX XXX" inputmode="numeric" maxlength="15">
+            <div class="kp-error" id="kp_vady_error" style="display:none;"></div>
+          </div>
         </div>
-        <div class="field">
-          <label><span class="q-num">11</span>Laharana kara-panondro</label>
-          <input type="text" name="kp_vady" id="kp_vady" placeholder="XXX XXX XXX XXX" inputmode="numeric" maxlength="15">
-          <div class="kp-error" id="kp_vady_error" style="display:none;"></div>
-        </div>
-      </div>
 
-      <div class="inline-group">
-        <div class="field">
-          <label><span class="q-num">12</span>Daty nanaovana kara-panondro</label>
-          <input type="text" name="daty_kp_vady" placeholder="JJ/MM/AAAA" pattern="(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/[0-9]{4}" title="Format: JJ/MM/AAAA">
+        <div class="inline-group">
+          <div class="field">
+            <label><span class="q-num">12</span>Daty nanaovana kara-panondro</label>
+            <input type="text" name="daty_kp_vady" placeholder="JJ/MM/AAAA" pattern="(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/[0-9]{4}" title="Format: JJ/MM/AAAA">
+          </div>
+          <div class="field">
+            <label><span class="q-num">12b</span>Toerana nanaovana kara-panondro</label>
+            <input type="text" name="toerana_kp_vady" placeholder="Toerana">
+          </div>
         </div>
-        <div class="field">
-          <label><span class="q-num">12b</span>Toerana nanaovana kara-panondro</label>
-          <input type="text" name="toerana_kp_vady" placeholder="Toerana">
-        </div>
-      </div>
 
-      <div class="inline-group">
-        <div class="field">
-          <label><span class="q-num">13</span>Daty nanaovana Duplicata</label>
-          <input type="text" name="daty_duplicata_vady" placeholder="JJ/MM/AAAA" pattern="(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/[0-9]{4}" title="Format: JJ/MM/AAAA">
-        </div>
-        <div class="field">
-          <label><span class="q-num">13b</span>Toerana nanaovana Duplicata</label>
-          <input type="text" name="toerana_duplicata_vady" placeholder="Toerana">
+        <div class="inline-group">
+          <div class="field">
+            <label><span class="q-num">13</span>Daty nanaovana Duplicata</label>
+            <input type="text" name="daty_duplicata_vady" placeholder="JJ/MM/AAAA" pattern="(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/[0-9]{4}" title="Format: JJ/MM/AAAA">
+          </div>
+          <div class="field">
+            <label><span class="q-num">13b</span>Toerana nanaovana Duplicata</label>
+            <input type="text" name="toerana_duplicata_vady" placeholder="Toerana">
+          </div>
         </div>
       </div>
 
@@ -1746,6 +1751,12 @@
           <label><span class="q-num">14</span>Laharana finday</label>
           <input type="text" name="finday" id="finday" placeholder="034 12 345 67" inputmode="numeric" maxlength="13">
         </div>
+      </div>
+      
+      <div class="section-divider"></div>
+      <p style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:14px">Toerana voakasika</p>
+
+      <div class="inline-group">
         <div class="field">
           <label><span class="q-num">15</span>Tondro GPS X (Longitude)</label>
           <input type="text" name="gps_x" placeholder="GPS X" id="gpsXField">
@@ -1786,42 +1797,48 @@
       <div class="field">
         <label><span class="q-num">17</span>Fantantra ve ny tetikasa?</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="fantatra_tetikasa" value="eny"> Eny</label>
-          <label class="choice-item"><input type="radio" name="fantatra_tetikasa" value="tsia"> Tsia</label>
+          <label class="choice-item"><input type="radio" name="fantatra_tetikasa" value="Eny"> Eny</label>
+          <label class="choice-item"><input type="radio" name="fantatra_tetikasa" value="Tsia"> Tsia</label>
         </div>
       </div>
 
-      <div class="field">
-        <label><span class="q-num">18</span>Inona?</label>
-        <input type="text" name="inona_tetikasa" placeholder="Fanazavana...">
-      </div>
+      <div id="fantatra-tetikasa-details" style="display:none;">
 
-      <div class="field">
-        <label><span class="q-num">19</span>Ho an'iza?</label>
-        <input type="text" name="ho_an_iza" placeholder="Ho an'iza?">
-      </div>
-
-      <div class="field">
-        <label><span class="q-num">20</span>Aiza?</label>
-        <input type="text" name="aiza" placeholder="Toerana...">
-      </div>
-
-      <div class="field">
-        <label><span class="q-num">21</span>Ahoana?</label>
-        <input type="text" name="ahoana" placeholder="Fomba...">
-      </div>
-
-      <div class="field">
-        <label><span class="q-num">22</span>Fantantra ve ireo vokatra entin'ny tetikasa?</label>
-        <div class="choices">
-          <label class="choice-item"><input type="radio" name="fantatra_vokatra" value="eny"> Eny</label>
-          <label class="choice-item"><input type="radio" name="fantatra_vokatra" value="tsia"> Tsia</label>
+        <div class="field">
+          <label><span class="q-num">18</span>Inona?</label>
+          <input type="text" name="inona_tetikasa" placeholder="Fanazavana...">
         </div>
-      </div>
 
-      <div class="field">
-        <label><span class="q-num">23</span>Raha eny, inona?</label>
-        <input type="text" name="vokatra_inona" placeholder="Inona ireo vokatra?">
+        <div class="field">
+          <label><span class="q-num">19</span>Ho an'iza?</label>
+          <input type="text" name="ho_an_iza" placeholder="Ho an'iza?">
+        </div>
+
+        <div class="field">
+          <label><span class="q-num">20</span>Aiza?</label>
+          <input type="text" name="aiza" placeholder="Toerana...">
+        </div>
+
+        <div class="field">
+          <label><span class="q-num">21</span>Ahoana?</label>
+          <input type="text" name="ahoana" placeholder="Fomba...">
+        </div>
+
+        <div class="field">
+          <label><span class="q-num">22</span>Fantantra ve ireo vokatra entin'ny tetikasa?</label>
+          <div class="choices">
+            <label class="choice-item"><input type="radio" name="fantatra_vokatra" value="Eny"> Eny</label>
+            <label class="choice-item"><input type="radio" name="fantatra_vokatra" value="Tsia"> Tsia</label>
+          </div>
+        </div>
+
+        <div id="fantatra-vokatra-details" style="display:none;">
+          <div class="field">
+            <label><span class="q-num">23</span>Raha eny, inona?</label>
+            <input type="text" name="vokatra_inona" placeholder="Inona ireo vokatra?">
+          </div>
+        </div>
+
       </div>
 
     </div>
@@ -1865,20 +1882,20 @@
       </div>
 
       <div class="field">
-        <label><span class="q-num">25</span>Kilasy nijanonana nianatra</label>
+        <label><span class="q-num">25</span>Kilasy nijanonan'ny PAP nianatra</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="kilasy" value="tsy_nianatra"> Tsy nianatra</label>
-          <label class="choice-item"><input type="radio" name="kilasy" value="fototra"> Ambaratonga fototra</label>
-          <label class="choice-item"><input type="radio" name="kilasy" value="faharoa"> Ambaratonga faharoa fototra</label>
-          <label class="choice-item"><input type="radio" name="kilasy" value="ambony"> Ambaratonga ambony</label>
+          <label class="choice-item"><input type="radio" name="kilasy" value="Tsy nianatra"> Tsy nianatra</label>
+          <label class="choice-item"><input type="radio" name="kilasy" value="Fototra"> Ambaratonga fototra</label>
+          <label class="choice-item"><input type="radio" name="kilasy" value="Faharoa"> Ambaratonga faharoa fototra</label>
+          <label class="choice-item"><input type="radio" name="kilasy" value="Ambony"> Ambaratonga ambony</label>
         </div>
       </div>
 
       <div class="field">
-        <label><span class="q-num">26</span>Mahay mamaky teny sy manoratra ve?</label>
+        <label><span class="q-num">26</span>Mahay mamaky teny sy manoratra ve ny PAP?</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="mamaky" value="eny"> Eny</label>
-          <label class="choice-item"><input type="radio" name="mamaky" value="tsia"> Tsia</label>
+          <label class="choice-item"><input type="radio" name="mamaky" value="Eny"> Eny</label>
+          <label class="choice-item"><input type="radio" name="mamaky" value="Tsia"> Tsia</label>
         </div>
       </div>
 
@@ -1900,10 +1917,19 @@
         </div>
         <div class="field">
           <label><span class="q-num">28</span>Isan'ny ankizy miditra an-tsekoly</label>
-          <div class="choices" style="margin-top:8px">
-            <label class="choice-item"><input type="checkbox" name="miditra_fototra"> Fototra</label>
-            <label class="choice-item"><input type="checkbox" name="miditra_faharoa"> Faharoa fototra</label>
-            <label class="choice-item"><input type="checkbox" name="miditra_ambony"> Ambony</label>
+          <div class="choices" style="margin-top:8px;flex-wrap:wrap;gap:10px">
+            <label class="choice-item" style="align-items:center;gap:6px">
+              <input type="checkbox" name="miditra_fototra" id="miditra_fototra" onchange="toggleQ28Number(this,'miditra_fototra_nb')"> Fototra
+              <input type="number" name="miditra_fototra_nb" id="miditra_fototra_nb" min="0" placeholder="Isa" style="display:none;width:70px;margin-left:4px">
+            </label>
+            <label class="choice-item" style="align-items:center;gap:6px">
+              <input type="checkbox" name="miditra_faharoa" id="miditra_faharoa" onchange="toggleQ28Number(this,'miditra_faharoa_nb')"> Faharoa fototra
+              <input type="number" name="miditra_faharoa_nb" id="miditra_faharoa_nb" min="0" placeholder="Isa" style="display:none;width:70px;margin-left:4px">
+            </label>
+            <label class="choice-item" style="align-items:center;gap:6px">
+              <input type="checkbox" name="miditra_ambony" id="miditra_ambony" onchange="toggleQ28Number(this,'miditra_ambony_nb')"> Ambony
+              <input type="number" name="miditra_ambony_nb" id="miditra_ambony_nb" min="0" placeholder="Isa" style="display:none;width:70px;margin-left:4px">
+            </label>
           </div>
         </div>
       </div>
@@ -1911,29 +1937,38 @@
       <div class="field">
         <label><span class="q-num">29a</span>Fari-pahalalan'ny Ray (lahy)</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="ray_fari" value="fototra"> Ambaratonga fototra</label>
-          <label class="choice-item"><input type="radio" name="ray_fari" value="faharoa"> Faharoa fototra</label>
-          <label class="choice-item"><input type="radio" name="ray_fari" value="ambony"> Ambony</label>
-          <label class="choice-item"><input type="radio" name="ray_fari" value="tsy_nianatra"> Tsy nianatra</label>
+          <label class="choice-item"><input type="radio" name="ray_fari" value="Ambaratonga fototra"> Ambaratonga fototra</label>
+          <label class="choice-item"><input type="radio" name="ray_fari" value="Faharoa fototra"> Faharoa fototra</label>
+          <label class="choice-item"><input type="radio" name="ray_fari" value="Ambony"> Ambony</label>
+          <label class="choice-item"><input type="radio" name="ray_fari" value="Tsy nianatra"> Tsy nianatra</label>
         </div>
       </div>
 
       <div class="field">
         <label><span class="q-num">29b</span>Fari-pahalalan'ny Reny (vavy)</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="reny_fari" value="fototra"> Ambaratonga fototra</label>
-          <label class="choice-item"><input type="radio" name="reny_fari" value="faharoa"> Faharoa fototra</label>
-          <label class="choice-item"><input type="radio" name="reny_fari" value="ambony"> Ambony</label>
-          <label class="choice-item"><input type="radio" name="reny_fari" value="tsy_nianatra"> Tsy nianatra</label>
+          <label class="choice-item"><input type="radio" name="reny_fari" value="Ambaratonga fototra"> Ambaratonga fototra</label>
+          <label class="choice-item"><input type="radio" name="reny_fari" value="Faharoa fototra"> Faharoa fototra</label>
+          <label class="choice-item"><input type="radio" name="reny_fari" value="Ambony"> Ambony</label>
+          <label class="choice-item"><input type="radio" name="reny_fari" value="Tsy nianatra"> Tsy nianatra</label>
         </div>
       </div>
 
       <div class="field">
         <label><span class="q-num">30</span>Vola lany amin'ny fanabeazana</label>
-        <div class="choices">
-          <label class="choice-item"><input type="checkbox" name="vola_fototra"> Ambaratonga fototra</label>
-          <label class="choice-item"><input type="checkbox" name="vola_faharoa"> Faharoa fototra</label>
-          <label class="choice-item"><input type="checkbox" name="vola_ambony"> Ambony</label>
+        <div class="choices" style="flex-wrap:wrap;gap:10px">
+          <label class="choice-item" style="align-items:center;gap:6px">
+            <input type="checkbox" name="vola_fototra" id="vola_fototra" onchange="toggleQ30Amount(this,'vola_fototra_mt')"> Ambaratonga fototra
+            <input type="number" name="vola_fototra_mt" id="vola_fototra_mt" min="0" placeholder="Ar" style="display:none;width:110px;margin-left:4px">
+          </label>
+          <label class="choice-item" style="align-items:center;gap:6px">
+            <input type="checkbox" name="vola_faharoa" id="vola_faharoa" onchange="toggleQ30Amount(this,'vola_faharoa_mt')"> Faharoa fototra
+            <input type="number" name="vola_faharoa_mt" id="vola_faharoa_mt" min="0" placeholder="Ar" style="display:none;width:110px;margin-left:4px">
+          </label>
+          <label class="choice-item" style="align-items:center;gap:6px">
+            <input type="checkbox" name="vola_ambony" id="vola_ambony" onchange="toggleQ30Amount(this,'vola_ambony_mt')"> Ambony
+            <input type="number" name="vola_ambony_mt" id="vola_ambony_mt" min="0" placeholder="Ar" style="display:none;width:110px;margin-left:4px">
+          </label>
         </div>
       </div>
 
@@ -1948,10 +1983,19 @@
 
       <div class="field">
         <label><span class="q-num">32</span>Elanelan'ny trano fonenana sy ny sekoly (km)</label>
-        <div class="choices">
-          <label class="choice-item"><input type="checkbox" name="elan_fototra"> Ambaratonga fototra</label>
-          <label class="choice-item"><input type="checkbox" name="elan_faharoa"> Faharoa fototra</label>
-          <label class="choice-item"><input type="checkbox" name="elan_ambony"> Ambony</label>
+        <div class="choices" style="flex-wrap:wrap;gap:10px">
+          <label class="choice-item" style="align-items:center;gap:6px">
+            <input type="checkbox" name="elan_fototra" id="elan_fototra" onchange="toggleQ32Distance(this,'elan_fototra_km')"> Ambaratonga fototra
+            <input type="number" name="elan_fototra_km" id="elan_fototra_km" min="0" step="0.1" placeholder="km" style="display:none;width:90px;margin-left:4px">
+          </label>
+          <label class="choice-item" style="align-items:center;gap:6px">
+            <input type="checkbox" name="elan_faharoa" id="elan_faharoa" onchange="toggleQ32Distance(this,'elan_faharoa_km')"> Faharoa fototra
+            <input type="number" name="elan_faharoa_km" id="elan_faharoa_km" min="0" step="0.1" placeholder="km" style="display:none;width:90px;margin-left:4px">
+          </label>
+          <label class="choice-item" style="align-items:center;gap:6px">
+            <input type="checkbox" name="elan_ambony" id="elan_ambony" onchange="toggleQ32Distance(this,'elan_ambony_km')"> Ambony
+            <input type="number" name="elan_ambony_km" id="elan_ambony_km" min="0" step="0.1" placeholder="km" style="display:none;width:90px;margin-left:4px">
+          </label>
         </div>
       </div>
 
@@ -2032,20 +2076,20 @@
       <div class="field">
         <label><span class="q-num">35</span>Fahafahana misitraka fitsaboana</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="fitsab_pct" value="lt25"> &lt;25%</label>
-          <label class="choice-item"><input type="radio" name="fitsab_pct" value="25_50"> 25–50%</label>
-          <label class="choice-item"><input type="radio" name="fitsab_pct" value="50_75"> 50–75%</label>
-          <label class="choice-item"><input type="radio" name="fitsab_pct" value="gt75"> &gt;75%</label>
+          <label class="choice-item"><input type="radio" name="fitsab_pct" value="inférieur à 25%"> &lt;25%</label>
+          <label class="choice-item"><input type="radio" name="fitsab_pct" value="25-50%"> 25–50%</label>
+          <label class="choice-item"><input type="radio" name="fitsab_pct" value="50-75%"> 50–75%</label>
+          <label class="choice-item"><input type="radio" name="fitsab_pct" value=">75%"> &gt;75%</label>
         </div>
       </div>
 
       <div class="field">
         <label><span class="q-num">36</span>Elanelan'ny toeram-pitsaboana sy ny trano fonenana</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="elan_fitsab" value="lt5"> &lt;5 km</label>
-          <label class="choice-item"><input type="radio" name="elan_fitsab" value="5_10"> 5–10 km</label>
-          <label class="choice-item"><input type="radio" name="elan_fitsab" value="10_15"> 10–15 km</label>
-          <label class="choice-item"><input type="radio" name="elan_fitsab" value="gt15"> &gt;15 km</label>
+          <label class="choice-item"><input type="radio" name="elan_fitsab" value="inférieur à 5km"> &lt;5 km</label>
+          <label class="choice-item"><input type="radio" name="elan_fitsab" value="5-10 km"> 5–10 km</label>
+          <label class="choice-item"><input type="radio" name="elan_fitsab" value="10-15 km"> 10–15 km</label>
+          <label class="choice-item"><input type="radio" name="elan_fitsab" value=">15 km"> &gt;15 km</label>
         </div>
       </div>
 
@@ -2159,10 +2203,10 @@
       <div class="field">
         <label><span class="q-num">44</span>Vola miditra eo anivon'ny tokatrano isambolana</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="vola_miditra" value="lt200k"> &lt;200 000 Ar</label>
-          <label class="choice-item"><input type="radio" name="vola_miditra" value="200_500k"> 200 000–500 000 Ar</label>
-          <label class="choice-item"><input type="radio" name="vola_miditra" value="500k_1m"> 500 000–1 000 000 Ar</label>
-          <label class="choice-item"><input type="radio" name="vola_miditra" value="gt1m"> &gt;1 000 000 Ar</label>
+          <label class="choice-item"><input type="radio" name="vola_miditra" value="Latsaky ny 200.000 Ar"> &lt;200 000 Ar</label>
+          <label class="choice-item"><input type="radio" name="vola_miditra" value="200.000-500.000 Ar"> 200 000–500 000 Ar</label>
+          <label class="choice-item"><input type="radio" name="vola_miditra" value="500.000-1.000.000 Ar"> 500 000–1 000 000 Ar</label>
+          <label class="choice-item"><input type="radio" name="vola_miditra" value="Mihoatra ny 1.000.000 Ar"> &gt;1 000 000 Ar</label>
         </div>
       </div>
 
@@ -2186,33 +2230,37 @@
       <div class="field">
         <label><span class="q-num">46</span>Fahafahana manao tahiry</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="tahiry" value="eny"> Eny</label>
-          <label class="choice-item"><input type="radio" name="tahiry" value="tsia"> Tsia</label>
+          <label class="choice-item"><input type="radio" name="tahiry" value="Eny"> Eny</label>
+          <label class="choice-item"><input type="radio" name="tahiry" value="Tsia"> Tsia</label>
         </div>
       </div>
 
-      <div class="field">
-        <label><span class="q-num">47</span>Raha Eny – Fahafahana manao tahiry (%)</label>
-        <div class="choices">
-          <label class="choice-item"><input type="radio" name="tahiry_pct" value="lt25"> &lt;25%</label>
-          <label class="choice-item"><input type="radio" name="tahiry_pct" value="25_50"> 25–50%</label>
-          <label class="choice-item"><input type="radio" name="tahiry_pct" value="50_75"> 50–75%</label>
-          <label class="choice-item"><input type="radio" name="tahiry_pct" value="gt75"> &gt;75%</label>
+      <div id="tahiry-eny" style="display:none;">
+        <div class="field">
+          <label><span class="q-num">47</span>Raha Eny – Fahafahana manao tahiry (%)</label>
+          <div class="choices">
+            <label class="choice-item"><input type="radio" name="tahiry_pct" value="Latsaky ny 25%"> &lt;25%</label>
+            <label class="choice-item"><input type="radio" name="tahiry_pct" value="25-50%"> 25–50%</label>
+            <label class="choice-item"><input type="radio" name="tahiry_pct" value="50-75%"> 50–75%</label>
+            <label class="choice-item"><input type="radio" name="tahiry_pct" value="Mihoatra ny 75%"> &gt;75%</label>
+          </div>
         </div>
       </div>
 
-      <div class="field">
-        <label><span class="q-num">48</span>Raha Tsia, inona ny antony?</label>
-        <input type="text" name="tsy_tahiry_antony" placeholder="Inona ny antony?">
+      <div id="tahiry-tsia" style="display:none;">
+        <div class="field">
+          <label><span class="q-num">48</span>Raha Tsia, inona ny antony?</label>
+          <input type="text" name="tsy_tahiry_antony" placeholder="Inona ny antony?">
+        </div>
       </div>
 
       <div class="field">
         <label><span class="q-num">49</span>Fomba fitahirizana vola</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="fitahiry" value="tsy_misy"> Tsy misy</label>
-          <label class="choice-item"><input type="radio" name="fitahiry" value="banky"> Banky</label>
-          <label class="choice-item"><input type="radio" name="fitahiry" value="mobile"> Mobile banking</label>
-          <label class="choice-item"><input type="radio" name="fitahiry" value="hafa"> Hafa</label>
+          <label class="choice-item"><input type="radio" name="fitahiry" value="Tsy misy"> Tsy misy</label>
+          <label class="choice-item"><input type="radio" name="fitahiry" value="Banky"> Banky</label>
+          <label class="choice-item"><input type="radio" name="fitahiry" value="Mobile banking"> Mobile banking</label>
+          <label class="choice-item"><input type="radio" name="fitahiry" value="Hafa"> Hafa</label>
         </div>
       </div>
 
@@ -2286,29 +2334,29 @@
       <div class="field">
         <label><span class="q-num">56</span>Mpampiasa ny tany</label>
         <div class="choices vertical">
-          <label class="choice-item"><input type="radio" name="mpampiasa_tany" value="tompony"> a) Tompony</label>
-          <label class="choice-item"><input type="radio" name="mpampiasa_tany" value="mpanofa"> b) Mpanofa ara-dalàna</label>
-          <label class="choice-item"><input type="radio" name="mpampiasa_tany" value="fahazoan"> c) Fahazoan-dalana hampiasa amin'ny fotoana voafetra</label>
-          <label class="choice-item"><input type="radio" name="mpampiasa_tany" value="razana"> d) Mpampiasa ara-drazana</label>
-          <label class="choice-item"><input type="radio" name="mpampiasa_tany" value="hafa"> e) Hafa</label>
+          <label class="choice-item"><input type="radio" name="mpampiasa_tany" value="Tompony"> a) Tompony</label>
+          <label class="choice-item"><input type="radio" name="mpampiasa_tany" value="Mpanofa ara-dalàna"> b) Mpanofa ara-dalàna</label>
+          <label class="choice-item"><input type="radio" name="mpampiasa_tany" value="Fahazoan-dalana hampiasa amin'ny fotoana voafetra"> c) Fahazoan-dalana hampiasa amin'ny fotoana voafetra</label>
+          <label class="choice-item"><input type="radio" name="mpampiasa_tany" value="Mpampiasa ara-drazana"> d) Mpampiasa ara-drazana</label>
+          <label class="choice-item"><input type="radio" name="mpampiasa_tany" value="Hafa"> e) Hafa</label>
         </div>
       </div>
 
       <div class="field">
         <label><span class="q-num">57</span>Fifanarahana amin'ny tompo-tany raha mpampiasa</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="fifanar_tany" value="tsy_misy"> Tsy misy</label>
-          <label class="choice-item"><input type="radio" name="fifanar_tany" value="soratra"> Fifanarahana voatana antsoratra</label>
-          <label class="choice-item"><input type="radio" name="fifanar_tany" value="am_bava"> Fifanarahana am-bava</label>
+          <label class="choice-item"><input type="radio" name="fifanar_tany" value="Tsy misy"> Tsy misy</label>
+          <label class="choice-item"><input type="radio" name="fifanar_tany" value="Fifanarahana voatana antsoratra"> Fifanarahana voatana antsoratra</label>
+          <label class="choice-item"><input type="radio" name="fifanar_tany" value="Fifanarahana am-bava"> Fifanarahana am-bava</label>
         </div>
       </div>
 
       <div class="field">
         <label><span class="q-num">58</span>Vesatry ny tany eo amin'ny fikorinan'ny renirano</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="vesatra_renirano" value="eny"> Eny</label>
-          <label class="choice-item"><input type="radio" name="vesatra_renirano" value="tsia"> Tsia</label>
-          <label class="choice-item"><input type="radio" name="vesatra_renirano" value="tsy_fantatra"> Tsy fantatra</label>
+          <label class="choice-item"><input type="radio" name="vesatra_renirano" value="Eny"> Eny</label>
+          <label class="choice-item"><input type="radio" name="vesatra_renirano" value="Tsia"> Tsia</label>
+          <label class="choice-item"><input type="radio" name="vesatra_renirano" value="Tsy fantatra"> Tsy fantatra</label>
         </div>
       </div>
 
@@ -2324,10 +2372,10 @@
       <div class="field">
         <label><span class="q-num">60</span>Tombambidin'ny tany (m²)</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="tombam_tany" value="lt10k"> &lt;10 000 Ar</label>
-          <label class="choice-item"><input type="radio" name="tombam_tany" value="10_50k"> 10–50 000 Ar</label>
-          <label class="choice-item"><input type="radio" name="tombam_tany" value="50_100k"> 50–100 000 Ar</label>
-          <label class="choice-item"><input type="radio" name="tombam_tany" value="gt100k"> &gt;100 000 Ar</label>
+          <label class="choice-item"><input type="radio" name="tombam_tany" value="Latsaky ny 10 000 Ar"> &lt;10 000 Ar</label>
+          <label class="choice-item"><input type="radio" name="tombam_tany" value="10 000 –50 000 Ar"> 10–50 000 Ar</label>
+          <label class="choice-item"><input type="radio" name="tombam_tany" value="50 000 –100 000 Ar"> 50–100 000 Ar</label>
+          <label class="choice-item"><input type="radio" name="tombam_tany" value="Mihoatra ny 100 000 Ar"> &gt;100 000 Ar</label>
         </div>
       </div>
 
@@ -2355,10 +2403,10 @@
       <div class="field">
         <label><span class="q-num">62</span>Fotoana niorina ny trano</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="trano_taona" value="2024"> Tao arin'ny 2024</label>
-          <label class="choice-item"><input type="radio" name="trano_taona" value="2_5"> 2–5 taona</label>
-          <label class="choice-item"><input type="radio" name="trano_taona" value="5_10"> 5–10 taona</label>
-          <label class="choice-item"><input type="radio" name="trano_taona" value="gt10"> Mihoatra ny 10 taona</label>
+          <label class="choice-item"><input type="radio" name="trano_taona" value="Tao arian'ny 2024"> Tao arian'ny 2024</label>
+          <label class="choice-item"><input type="radio" name="trano_taona" value="2–5 taona"> 2–5 taona</label>
+          <label class="choice-item"><input type="radio" name="trano_taona" value="5–10 taona"> 5–10 taona</label>
+          <label class="choice-item"><input type="radio" name="trano_taona" value="Mihoatra ny 10 taona"> Mihoatra ny 10 taona</label>
         </div>
       </div>
 
@@ -2369,7 +2417,7 @@
           <label class="choice-item"><input type="radio" name="trano_rihana" value="1"> Iray</label>
           <label class="choice-item"><input type="radio" name="trano_rihana" value="2"> Roa</label>
           <label class="choice-item"><input type="radio" name="trano_rihana" value="3"> Telo</label>
-          <label class="choice-item"><input type="radio" name="trano_rihana" value="gt3"> Mihoatra ny telo</label>
+          <label class="choice-item"><input type="radio" name="trano_rihana" value="Mihoatra ny telo"> Mihoatra ny telo</label>
         </div>
       </div>
 
@@ -2380,7 +2428,7 @@
           <label class="choice-item"><input type="radio" name="trano_efitrano" value="2"> 2</label>
           <label class="choice-item"><input type="radio" name="trano_efitrano" value="3"> 3</label>
           <label class="choice-item"><input type="radio" name="trano_efitrano" value="4"> 4</label>
-          <label class="choice-item"><input type="radio" name="trano_efitrano" value="gt4"> +4</label>
+          <label class="choice-item"><input type="radio" name="trano_efitrano" value="Mihoatra ny 4"> +4</label>
         </div>
       </div>
 
@@ -2425,11 +2473,11 @@
       <div class="field">
         <label><span class="q-num">69</span>Tombanana firy isan-jato ny fanelingelenana eo amin'ny fiainan'ny ankohonana</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="faneling_fianakaviana" value="lt25"> &lt;25%</label>
-          <label class="choice-item"><input type="radio" name="faneling_fianakaviana" value="25_50"> 25–50%</label>
-          <label class="choice-item"><input type="radio" name="faneling_fianakaviana" value="50_75"> 50–75%</label>
-          <label class="choice-item"><input type="radio" name="faneling_fianakaviana" value="gt75"> &gt;75%</label>
-          <label class="choice-item"><input type="radio" name="faneling_fianakaviana" value="tsy_misy"> Tsy misy</label>
+          <label class="choice-item"><input type="radio" name="faneling_fianakaviana" value="Latsaky ny 25%"> &lt;25%</label>
+          <label class="choice-item"><input type="radio" name="faneling_fianakaviana" value="25–50%"> 25–50%</label>
+          <label class="choice-item"><input type="radio" name="faneling_fianakaviana" value="50–75%"> 50–75%</label>
+          <label class="choice-item"><input type="radio" name="faneling_fianakaviana" value="Mihoatra ny 75%"> &gt;75%</label>
+          <label class="choice-item"><input type="radio" name="faneling_fianakaviana" value="Tsy misy"> Tsy misy</label>
         </div>
       </div>
 
@@ -2437,10 +2485,10 @@
         <label><span class="q-num">70</span>Fahavitan-tena amin'ny fifindrana</label>
         <div class="choices">
           <label class="choice-item"><input type="radio" name="fifindrana_pct" value="0"> 0%</label>
-          <label class="choice-item"><input type="radio" name="fifindrana_pct" value="lt25"> &lt;25%</label>
-          <label class="choice-item"><input type="radio" name="fifindrana_pct" value="25_50"> 25–50%</label>
-          <label class="choice-item"><input type="radio" name="fifindrana_pct" value="50_75"> 50–75%</label>
-          <label class="choice-item"><input type="radio" name="fifindrana_pct" value="gt75"> &gt;75%</label>
+          <label class="choice-item"><input type="radio" name="fifindrana_pct" value="Latsaky ny 25%"> &lt;25%</label>
+          <label class="choice-item"><input type="radio" name="fifindrana_pct" value="25–50%"> 25–50%</label>
+          <label class="choice-item"><input type="radio" name="fifindrana_pct" value="50–75%"> 50–75%</label>
+          <label class="choice-item"><input type="radio" name="fifindrana_pct" value="Mihoatra ny 75%"> &gt;75%</label>
         </div>
       </div>
 
@@ -2448,21 +2496,21 @@
         <label><span class="q-num">71</span>Tombanana firy isan-jato ny fanelingelenana ateraky ny tetikasa amin'ny asa fivelomana</label>
         <div class="choices">
           <label class="choice-item"><input type="radio" name="faneling_fivelomana" value="0"> 0%</label>
-          <label class="choice-item"><input type="radio" name="faneling_fivelomana" value="lt25"> &lt;25%</label>
-          <label class="choice-item"><input type="radio" name="faneling_fivelomana" value="25_50"> 25–50%</label>
-          <label class="choice-item"><input type="radio" name="faneling_fivelomana" value="50_75"> 50–75%</label>
-          <label class="choice-item"><input type="radio" name="faneling_fivelomana" value="gt75"> &gt;75%</label>
+          <label class="choice-item"><input type="radio" name="faneling_fivelomana" value="Latsaky ny 25%"> &lt;25%</label>
+          <label class="choice-item"><input type="radio" name="faneling_fivelomana" value="25–50%"> 25–50%</label>
+          <label class="choice-item"><input type="radio" name="faneling_fivelomana" value="50–75%"> 50–75%</label>
+          <label class="choice-item"><input type="radio" name="faneling_fivelomana" value="Mihoatra ny 75%"> &gt;75%</label>
         </div>
       </div>
 
       <div class="field">
         <label><span class="q-num">72</span>Fahafahana miarina ara-pivelomana raha voaelingelina ny asa</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="miarina_pct" value="0"> 0%</label>
-          <label class="choice-item"><input type="radio" name="miarina_pct" value="lt25"> &lt;25%</label>
-          <label class="choice-item"><input type="radio" name="miarina_pct" value="25_50"> 25–50%</label>
-          <label class="choice-item"><input type="radio" name="miarina_pct" value="50_75"> 50–75%</label>
-          <label class="choice-item"><input type="radio" name="miarina_pct" value="gt75"> &gt;75%</label>
+          <label class="choice-item"><input type="radio" name="miarina_pct" value="0%"> 0%</label>
+          <label class="choice-item"><input type="radio" name="miarina_pct" value="Latsaky ny 25%"> &lt;25%</label>
+          <label class="choice-item"><input type="radio" name="miarina_pct" value="25–50%"> 25–50%</label>
+          <label class="choice-item"><input type="radio" name="miarina_pct" value="50–75%"> 50–75%</label>
+          <label class="choice-item"><input type="radio" name="miarina_pct" value="Mihoatra ny 75%"> &gt;75%</label>
         </div>
       </div>
 
@@ -2480,18 +2528,18 @@
       <div class="field">
         <label><span class="q-num">73</span>Tany</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="fanak_tany" value="manontolo"> Manontolo</label>
-          <label class="choice-item"><input type="radio" name="fanak_tany" value="ampahany"> Ampahany</label>
-          <label class="choice-item"><input type="radio" name="fanak_tany" value="tsy_misy"> Tsy misy</label>
+          <label class="choice-item"><input type="radio" name="fanak_tany" value="Manontolo"> Manontolo</label>
+          <label class="choice-item"><input type="radio" name="fanak_tany" value="Ampahany"> Ampahany</label>
+          <label class="choice-item"><input type="radio" name="fanak_tany" value="Tsy misy"> Tsy misy</label>
         </div>
       </div>
 
       <div class="field">
         <label><span class="q-num">74</span>Trano</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="fanak_trano" value="manontolo"> Manontolo</label>
-          <label class="choice-item"><input type="radio" name="fanak_trano" value="ampahany"> Ampahany</label>
-          <label class="choice-item"><input type="radio" name="fanak_trano" value="tsy_misy"> Tsy misy</label>
+          <label class="choice-item"><input type="radio" name="fanak_trano" value="Manontolo"> Manontolo</label>
+          <label class="choice-item"><input type="radio" name="fanak_trano" value="Ampahany"> Ampahany</label>
+          <label class="choice-item"><input type="radio" name="fanak_trano" value="Tsy misy"> Tsy misy</label>
         </div>
       </div>
 
@@ -2554,20 +2602,20 @@
       <div class="field">
         <label><span class="q-num">77</span>Toe-pahasalaman'ny raim-pianakaviana</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="tsalama_ray" value="salama"> Salama tsara</label>
-          <label class="choice-item"><input type="radio" name="tsalama_ray" value="sembanana"> Tra-pahasembanana</label>
-          <label class="choice-item"><input type="radio" name="tsalama_ray" value="60taona"> Mihoatra ny 60 taona</label>
-          <label class="choice-item"><input type="radio" name="tsalama_ray" value="farofy"> Farofy</label>
+          <label class="choice-item"><input type="radio" name="tsalama_ray" value="Salama tsara"> Salama tsara</label>
+          <label class="choice-item"><input type="radio" name="tsalama_ray" value="Tra-pahasembanana"> Tra-pahasembanana</label>
+          <label class="choice-item"><input type="radio" name="tsalama_ray" value="Mihoatra ny 60 taona"> Mihoatra ny 60 taona</label>
+          <label class="choice-item"><input type="radio" name="tsalama_ray" value="Farofy"> Farofy</label>
         </div>
       </div>
 
       <div class="field">
         <label><span class="q-num">78</span>Toe-pahasalaman'ny renim-pianakaviana</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="tsalama_reny" value="salama"> Salama tsara</label>
-          <label class="choice-item"><input type="radio" name="tsalama_reny" value="sembanana"> Tra-pahasembanana</label>
-          <label class="choice-item"><input type="radio" name="tsalama_reny" value="60taona"> Mihoatra ny 60 taona</label>
-          <label class="choice-item"><input type="radio" name="tsalama_reny" value="farofy"> Farofy</label>
+          <label class="choice-item"><input type="radio" name="tsalama_reny" value="Salama tsara"> Salama tsara</label>
+          <label class="choice-item"><input type="radio" name="tsalama_reny" value="Tra-pahasembanana"> Tra-pahasembanana</label>
+          <label class="choice-item"><input type="radio" name="tsalama_reny" value="Mihoatra ny 60 taona"> Mihoatra ny 60 taona</label>
+          <label class="choice-item"><input type="radio" name="tsalama_reny" value="Farofy"> Farofy</label>
         </div>
       </div>
 
@@ -2593,8 +2641,8 @@
       <div class="field">
         <label><span class="q-num">82</span>Herisetra mihantra amin'ny vehivavy</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="herisetra" value="eny"> Eny</label>
-          <label class="choice-item"><input type="radio" name="herisetra" value="tsia"> Tsia</label>
+          <label class="choice-item"><input type="radio" name="herisetra" value="Eny"> Eny</label>
+          <label class="choice-item"><input type="radio" name="herisetra" value="Tsia"> Tsia</label>
         </div>
       </div>
 
@@ -2687,17 +2735,17 @@
       <div class="field">
         <label><span class="q-num">89</span>Mahakasika ny fandravana</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="fandravana" value="tompony"> a) Ataon'ny tompony</label>
-          <label class="choice-item"><input type="radio" name="fandravana" value="orinasa"> b) Ataon'ny orinasa manao ny fefiloha</label>
+          <label class="choice-item"><input type="radio" name="fandravana" value="Ataon'ny tompony"> a) Ataon'ny tompony</label>
+          <label class="choice-item"><input type="radio" name="fandravana" value="Ataon'ny orinasa manao ny fefiloha"> b) Ataon'ny orinasa manao ny fefiloha</label>
         </div>
       </div>
 
       <div class="field">
         <label><span class="q-num">90</span>Fanonerana safidiana</label>
         <div class="choices vertical">
-          <label class="choice-item"><input type="radio" name="fanonerana" value="ara_bola"> a) Fanonerana ara-bola</label>
-          <label class="choice-item"><input type="radio" name="fanonerana" value="zavatra"> b) Fanonerana ny zavatra simba amin'ny laoniny</label>
-          <label class="choice-item"><input type="radio" name="fanonerana" value="famindrana"> c) Famindrana amin'ny toerana voahomana amboarin'ny tetikasa</label>
+          <label class="choice-item"><input type="radio" name="fanonerana" value="Fanonerana ara-bola"> a) Fanonerana ara-bola</label>
+          <label class="choice-item"><input type="radio" name="fanonerana" value="Fanonerana ny zavatra simba amin'ny laoniny"> b) Fanonerana ny zavatra simba amin'ny laoniny</label>
+          <label class="choice-item"><input type="radio" name="fanonerana" value="Famindrana amin'ny toerana voahomana amboarin'ny tetikasa"> c) Famindrana amin'ny toerana voahomana amboarin'ny tetikasa</label>
         </div>
       </div>
 
@@ -2729,11 +2777,11 @@
       <div class="field">
         <label><span class="q-num">93</span>Fomba hifanarahana amin'ny tetikasa</label>
         <div class="choices vertical">
-          <label class="choice-item"><input type="radio" name="fomba_fifanar" value="a"> a) An-taratasy voavakinao sy voasoni-nao</label>
-          <label class="choice-item"><input type="radio" name="fomba_fifanar" value="b"> b) An-taratasy voavakin'olona sy voasoni-nao</label>
-          <label class="choice-item"><input type="radio" name="fomba_fifanar" value="c"> c) An-taratasy voavakinao sy misy lavotondro</label>
-          <label class="choice-item"><input type="radio" name="fomba_fifanar" value="d"> d) An-taratasy voavakin'olona sy misy lavotondro</label>
-          <label class="choice-item"><input type="radio" name="fomba_fifanar" value="e"> e) Fanomezana alalana ny iray amin'ny ankohonana efa feno taona hisolo tena mahay mamaky teny sy manoratra</label>
+          <label class="choice-item"><input type="radio" name="fomba_fifanar" value="An-taratasy voavakinao sy voasoni-nao"> a) An-taratasy voavakinao sy voasoni-nao</label>
+          <label class="choice-item"><input type="radio" name="fomba_fifanar" value="An-taratasy voavakin'olona sy voasoni-nao"> b) An-taratasy voavakin'olona sy voasoni-nao</label>
+          <label class="choice-item"><input type="radio" name="fomba_fifanar" value="An-taratasy voavakinao sy misy lavotondro"> c) An-taratasy voavakinao sy misy lavotondro</label>
+          <label class="choice-item"><input type="radio" name="fomba_fifanar" value="An-taratasy voavakin'olona sy misy lavotondro"> d) An-taratasy voavakin'olona sy misy lavotondro</label>
+          <label class="choice-item"><input type="radio" name="fomba_fifanar" value="Fanomezana alalana ny iray amin'ny ankohonana efa feno taona hisolo tena mahay mamaky teny sy manoratra"> e) Fanomezana alalana ny iray amin'ny ankohonana efa feno taona hisolo tena mahay mamaky teny sy manoratra</label>
         </div>
       </div>
 
@@ -3171,11 +3219,13 @@
         <label style="font-weight:600;font-size:13px;margin-bottom:8px;display:block;">Type de document</label>
         <select name="doc_${documentIdCounter}_type" style="width:100%;" onchange="updateDocumentType(${documentIdCounter}, this.value)">
           <option value="">-- Safidio ny karazana taratasy --</option>
-          <option value="acte_vente">Acte de vente</option>
-          <option value="titre_foncier">Titre foncier</option>
-          <option value="contrat_bail">Contrat de bail</option>
-          <option value="photos_biens">Photos des biens affectés</option>
-          <option value="autre">Autre documents (à préciser)</option>
+          <option value="cni">📜 Carte Nationale d'Identité</option>
+          <option value="karatany">📜 Karatany</option>
+          <option value="acte_vente">📜 Acte de vente</option>
+          <option value="titre_foncier">📜 Titre foncier</option>
+          <option value="contrat_bail">📜 Contrat de bail</option>
+          <option value="photos_biens">📜 Photos des biens affectés</option>
+          <option value="autre">📜 Autre documents (à préciser)</option>
         </select>
       </div>
       
@@ -3499,6 +3549,311 @@
     render();
   }
 
+  // ═══════════════════════════════════════════════════════════════
+  // FIELD_LABELS — libellés de chaque champ pour l'export JSON
+  // ═══════════════════════════════════════════════════════════════
+  const FIELD_LABELS = {
+    // ── sec0 : Identification ──────────────────────────────────────
+    daty:                       'Daty',
+    distrika:                   'Distrika',
+    kaomina:                    'Kaomina',
+    fokontany:                  'Fokontany',
+    kaody_renirano:             'Kaody Renirano',
+    laharana_fisy:              "Laharan'ny fisy",
+    // ── sec1 : PAP ────────────────────────────────────────────────
+    anarana:                    '1. Anarana',
+    fanampiny:                  '2. Fanampiny',
+    taona:                      '3. Taona',
+    fananahana:                 '4. Fananahana',
+    fanambadiana:               '5. Fanambadiana',
+    laharana_kp:                '6. Laharana kara-panondro',
+    daty_kp:                    '7. Daty nanaovana kara-panondro',
+    toerana_kp:                 '7b. Toerana nanaovana kara-panondro',
+    daty_duplicata:             '8. Daty nanaovana Duplicata',
+    toerana_duplicata:          '8b. Toerana nanaovana Duplicata',
+    anarana_vady:               "9. Anarana sy fanampin'anarana ny vady",
+    taona_vady:                 '10. Taona (vady)',
+    kp_vady:                    '11. Laharana kara-panondro (vady)',
+    daty_kp_vady:               '12. Daty nanaovana kara-panondro (vady)',
+    toerana_kp_vady:            '12b. Toerana nanaovana kara-panondro (vady)',
+    daty_duplicata_vady:        '13. Daty nanaovana Duplicata (vady)',
+    toerana_duplicata_vady:     '13b. Toerana nanaovana Duplicata (vady)',
+    finday:                     '14. Laharana finday',
+    gps_x:                      '15. Tondro GPS X (Longitude)',
+    gps_y:                      '16. Tondro GPS Y (Latitude)',
+    gps_precision:              '17. Précision GPS (mètres)',
+    // ── sec2 : Fahafantarana ──────────────────────────────────────
+    fantatra_tetikasa:          '17. Fantatra ve ny tetikasa?',
+    inona_tetikasa:             '18. Inona?',
+    ho_an_iza:                  "19. Ho an'iza?",
+    aiza:                       '20. Aiza?',
+    ahoana:                     '21. Ahoana?',
+    fantatra_vokatra:           '22. Fantatra ve ireo vokatra entin\'ny tetikasa?',
+    vokatra_inona:              '23. Raha eny, inona?',
+    // ── sec3 : Tokatrano ──────────────────────────────────────────
+    membres_menage:             '24. Fitsinjarana araky ny taona sy fananahana eo anivon\'ny ankohonana',
+    kilasy:                     '25. Kilasy nijanonana nianatra',
+    mamaky:                     '26. Mahay mamaky teny sy manoratra ve?',
+    // ── sec4 : Fanabeazana ────────────────────────────────────────
+    isan_ankizy_sekoly_taona:   "27. Isan'ny ankizy manana salan-taona tokony hiditra sekoly",
+    miditra_fototra:            "28. Isan'ny ankizy miditra an-tsekoly – Fototra",
+    miditra_fototra_nb:         "28. Isan'ny ankizy miditra an-tsekoly – Fototra (isa)",
+    miditra_faharoa:            "28. Isan'ny ankizy miditra an-tsekoly – Faharoa fototra",
+    miditra_faharoa_nb:         "28. Isan'ny ankizy miditra an-tsekoly – Faharoa fototra (isa)",
+    miditra_ambony:             "28. Isan'ny ankizy miditra an-tsekoly – Ambony",
+    miditra_ambony_nb:          "28. Isan'ny ankizy miditra an-tsekoly – Ambony (isa)",
+    ray_fari:                   '29a. Fari-pahalalan\'ny Ray (lahy)',
+    reny_fari:                  '29b. Fari-pahalalan\'ny Reny (vavy)',
+    vola_fototra:               '30. Vola lany amin\'ny fanabeazana – Fototra',
+    vola_fototra_mt:            '30. Vola lany amin\'ny fanabeazana – Fototra (Ar)',
+    vola_faharoa:               '30. Vola lany amin\'ny fanabeazana – Faharoa fototra',
+    vola_faharoa_mt:            '30. Vola lany amin\'ny fanabeazana – Faharoa fototra (Ar)',
+    vola_ambony:                '30. Vola lany amin\'ny fanabeazana – Ambony',
+    vola_ambony_mt:             '30. Vola lany amin\'ny fanabeazana – Ambony (Ar)',
+    famp_fototra:               '31. Fahafahana mampiana-janaka – Fototra',
+    famp_faharoa:               '31. Fahafahana mampiana-janaka – Faharoa fototra',
+    famp_ambony:                '31. Fahafahana mampiana-janaka – Ambony',
+    elan_fototra:               '32. Elanelan\'ny trano fonenana sy ny sekoly – Fototra',
+    elan_fototra_km:            '32. Elanelan\'ny trano fonenana sy ny sekoly – Fototra (km)',
+    elan_faharoa:               '32. Elanelan\'ny trano fonenana sy ny sekoly – Faharoa fototra',
+    elan_faharoa_km:            '32. Elanelan\'ny trano fonenana sy ny sekoly – Faharoa fototra (km)',
+    elan_ambony:                '32. Elanelan\'ny trano fonenana sy ny sekoly – Ambony',
+    elan_ambony_km:             '32. Elanelan\'ny trano fonenana sy ny sekoly – Ambony (km)',
+    // ── sec5 : Fahasalamana ───────────────────────────────────────
+    aretina1:                   '33. Aretina 1 – Anarana',
+    aretina1_fahavaratra:       '33. Aretina 1 – Fahavaratra',
+    aretina1_ririnina:          '33. Aretina 1 – Ririnina',
+    aretina1_mandava:           '33. Aretina 1 – Mandavataona',
+    aretina1_note:              '33. Aretina 1 – Fanamarihana',
+    aretina2:                   '33. Aretina 2 – Anarana',
+    aretina2_fahavaratra:       '33. Aretina 2 – Fahavaratra',
+    aretina2_ririnina:          '33. Aretina 2 – Ririnina',
+    aretina2_mandava:           '33. Aretina 2 – Mandavataona',
+    aretina2_note:              '33. Aretina 2 – Fanamarihana',
+    aretina3:                   '33. Aretina 3 – Anarana',
+    aretina3_fahavaratra:       '33. Aretina 3 – Fahavaratra',
+    aretina3_ririnina:          '33. Aretina 3 – Ririnina',
+    aretina3_mandava:           '33. Aretina 3 – Mandavataona',
+    aretina3_note:              '33. Aretina 3 – Fanamarihana',
+    tsab_tsy_misy:              '34. Toeram-pitsaboana – Tsy misy',
+    tsab_nentim:                '34. Toeram-pitsaboana – Mpitsabo nentim-paharazana',
+    tsab_mpanent:               '34. Toeram-pitsaboana – Mpanentana ara-pahasalamana',
+    tsab_csb:                   '34. Toeram-pitsaboana – CSB',
+    tsab_hopitaly:              '34. Toeram-pitsaboana – Hopitaly lehibe',
+    tsab_tsy_miank:             '34. Toeram-pitsaboana – Mpitsabo tsy miankina',
+    fitsab_pct:                 '35. Fahafahana misitraka fitsaboana',
+    elan_fitsab:                '36. Elanelan\'ny toeram-pitsaboana sy ny trano fonenana',
+    // ── sec6 : Tolotra fototra ────────────────────────────────────
+    rano_paompy_trano:          '37. Toerana fangalana rano – Paompy ao an-trano',
+    rano_paompy_iomb:           '37. Toerana fangalana rano – Paompy iombonana',
+    rano_lavadrano_man:         '37. Toerana fangalana rano – Lavadrano manokana',
+    rano_lavadrano_iomb:        '37. Toerana fangalana rano – Lavadrano iombonana',
+    rano_loharano:              '37. Toerana fangalana rano – Loharano (rano boaka)',
+    rano_renirano:              '37. Toerana fangalana rano – Renirano',
+    maloto_trano:               '38. Toerana fanaovana maloto – Trano fivoahana ao an-trano',
+    maloto_iomb:                '38. Toerana fanaovana maloto – Trano fivoahana iombonana',
+    maloto_ankal:               '38. Toerana fanaovana maloto – Ankalamanjana',
+    maloto_amoron:              '38. Toerana fanaovana maloto – Amoron-drano',
+    diov_trano:                 '39. Toerana fidiovana – Ao an-trano',
+    diov_iomb:                  '39. Toerana fidiovana – Toerana iombonana',
+    diov_renirano:              '39. Toerana fidiovana – Renirano',
+    jiro_jirama:                '40. Jiro ampiasaina – JIRAMA',
+    jiro_masoandro:             '40. Jiro ampiasaina – Angovo avy amin\'ny masoandro',
+    jiro_torche:                '40. Jiro ampiasaina – Torche',
+    jiro_labozia:               '40. Jiro ampiasaina – Labozia',
+    jiro_petrole:               '40. Jiro ampiasaina – Petrole',
+    jiro_tsy_misy:              '40. Jiro ampiasaina – Tsy misy',
+    afand_arina:                '41. Akora fandrehitra – Arina fandrehitra',
+    afand_herin:                '41. Akora fandrehitra – Herin\'aratra',
+    afand_kitay:                '41. Akora fandrehitra – Kitay',
+    afand_entona:               '41. Akora fandrehitra – Entona fandrahoana',
+    // ── sec7 : Vola ───────────────────────────────────────────────
+    vola_f_tsy_misy:            '42. Loharanom-bola fototra – a) Tsy misy',
+    vola_f_mamboly:             '42. Loharanom-bola fototra – b) Mamboly sy miompy',
+    vola_f_mivarotra:           '42. Loharanom-bola fototra – c) Mivarotra',
+    vola_f_mpanjono:            '42. Loharanom-bola fototra – d) Manarato / mpanjono',
+    vola_f_miasa_ori:           '42. Loharanom-bola fototra – e) Miasa amin\'ny orinasa na fanjakana',
+    vola_f_asa_tanana:          '42. Loharanom-bola fototra – f) Manao asa tanana',
+    vola_f_biriky:              '42. Loharanom-bola fototra – g) Manao biriky',
+    vola_f_fasika:              '42. Loharanom-bola fototra – h) Maka fasika',
+    vola_f_antselika:           '42. Loharanom-bola fototra – i) Miasa antselika',
+    vola_f_hafa:                '42. Loharanom-bola fototra – j) Hafa',
+    vola_a_tsy_misy:            '43. Loharanom-bola fanampiny – a) Tsy misy',
+    vola_a_mamboly:             '43. Loharanom-bola fanampiny – b) Mamboly sy miompy',
+    vola_a_mivarotra:           '43. Loharanom-bola fanampiny – c) Mivarotra',
+    vola_a_mpanjono:            '43. Loharanom-bola fanampiny – d) Manarato / mpanjono',
+    vola_a_miasa_ori:           '43. Loharanom-bola fanampiny – e) Miasa amin\'ny orinasa na fanjakana',
+    vola_a_asa_tanana:          '43. Loharanom-bola fanampiny – f) Manao asa tanana',
+    vola_a_biriky:              '43. Loharanom-bola fanampiny – g) Manao biriky',
+    vola_a_fasika:              '43. Loharanom-bola fanampiny – h) Maka fasika',
+    vola_a_antselika:           '43. Loharanom-bola fanampiny – i) Miasa antselika',
+    vola_a_hafa:                '43. Loharanom-bola fanampiny – j) Hafa',
+    vola_miditra:               "44. Vola miditra eo anivon'ny tokatrano isambolana",
+    fand_sakafo:                '45. Fandaniana – Sakafo',
+    fand_sakafo_taha:           '45. Fandaniana – Sakafo (%)',
+    fand_fahasalamana:          '45. Fandaniana – Fahasalamana',
+    fand_fahasalamana_taha:     '45. Fandaniana – Fahasalamana (%)',
+    fand_fanabeazana:           '45. Fandaniana – Fanabeazana',
+    fand_fanabeazana_taha:      '45. Fandaniana – Fanabeazana (%)',
+    fand_trano:                 '45. Fandaniana – Trano fonenana',
+    fand_trano_taha:            '45. Fandaniana – Trano fonenana (%)',
+    fand_fitafiana:             '45. Fandaniana – Fitafiana sy kojakoja',
+    fand_fitafiana_taha:        '45. Fandaniana – Fitafiana sy kojakoja (%)',
+    fand_hafa:                  '45. Fandaniana – Hafa',
+    fand_hafa_taha:             '45. Fandaniana – Hafa (%)',
+    tahiry:                     '46. Fahafahana manao tahiry',
+    tahiry_pct:                 '47. Fahafahana manao tahiry (%)',
+    tsy_tahiry_antony:          '48. Raha Tsia, inona ny antony?',
+    fitahiry:                   '49. Fomba fitahirizana vola',
+    fndram_tsy_misy:            '50. Findramam-bola – a) Tsy misy',
+    fndram_banky:               '50. Findramam-bola – b) Banky',
+    fndram_mpamp:               '50. Findramam-bola – c) Mpampanjana-bola',
+    fndram_microf:              '50. Findramam-bola – d) Micro-finance',
+    fndram_varymaitso:          '50. Findramam-bola – e) Vary maitso',
+    fndram_mobile:              '50. Findramam-bola – f) Mobile banking',
+    fndram_hafa:                '50. Findramam-bola – g) Hafa',
+    // ── sec8 : Tany ───────────────────────────────────────────────
+    tany_tokotany:              "51. Sokajin'ny tany – a) Tokotany misy trano",
+    tany_voajary:               "51. Sokajin'ny tany – b) Tanimboly voajary",
+    tany_sasatra:               "51. Sokajin'ny tany – c) Tanimboly miala sasatra",
+    tany_tanimbary:             "51. Sokajin'ny tany – d) Tanimbary",
+    voly_vary:                  '52. Voly maniry – Vary',
+    voly_ananana:               '52. Voly maniry – Ananana',
+    voly_mangahazo:             '52. Voly maniry – Mangahazo',
+    voly_katsaka:               '52. Voly maniry – Katsaka',
+    voly_vomanga:               '52. Voly maniry – Vomanga',
+    voly_legioma:               '52. Voly maniry – Legioma',
+    refin_tany_total:           "53. Refin'ny tany manontolo",
+    refin_tany_voak:            "54. Refin'ny tany voakasika",
+    tar_titra:                  '55. Taratasy mahakasika ny fananan-tany – Titra',
+    tar_kadasitra:              '55. Taratasy mahakasika ny fananan-tany – Kadasitra',
+    tar_karatany:               '55. Taratasy mahakasika ny fananan-tany – Karatany',
+    tar_tsy_misy:               '55. Taratasy mahakasika ny fananan-tany – Tsy misy',
+    mpampiasa_tany:             '56. Mpampiasa ny tany',
+    fifanar_tany:               '57. Fifanarahana amin\'ny tompo-tany raha mpampiasa',
+    vesatra_renirano:           '58. Vesatry ny tany eo amin\'ny fikorinan\'ny renirano',
+    vesatra_fefiloha:           "59. Raha Eny, inona? – a) Fahavakisan'ny fefiloha",
+    vesatra_zotry:              "59. Raha Eny, inona? – b) Fivilianan'ny zotry ny renirano",
+    vesatra_hafa:               '59. Raha Eny, inona? – c) Hafa',
+    tombam_tany:                "60. Tombambidin'ny tany (m²)",
+    // ── sec9 : Trano ──────────────────────────────────────────────
+    trano_fonenana:             '61. Ampiasana ny trano – a) Trano fonenana',
+    trano_fivarotana_l:         '61. Ampiasana ny trano – b) Fivarotana lehibe',
+    trano_fivarotana_m:         '61. Ampiasana ny trano – c) Fivarotana madinika',
+    trano_hafa:                 '61. Ampiasana ny trano – d) Hafa',
+    trano_taona:                '62. Fotoana niorina ny trano',
+    trano_rihana:               "63. Isan'ny rihana",
+    trano_efitrano:             "64. Isan'ny efitrano",
+    mat_vato:                   '65. Akora nanaovana ny trano – Vato (parpaing)',
+    mat_biriky:                 '65. Akora nanaovana ny trano – Biriky',
+    mat_hazo:                   '65. Akora nanaovana ny trano – Hazo',
+    mat_vy:                     '65. Akora nanaovana ny trano – Vy fotsy',
+    mat_hafa:                   '65. Akora nanaovana ny trano – Hafa',
+    refin_trano_total:          "66. Refin'ny trano manontolo",
+    refin_trano_voak:           "67. Refin'ny trano voakasika",
+    tombam_trano:               "68. Tombambidin'ny trano",
+    // ── sec10 : Fanelingelenana ───────────────────────────────────
+    faneling_fianakaviana:      "69. Tombanana firy isan-jato ny fanelingelenana eo amin'ny fiainan'ny ankohonana",
+    fifindrana_pct:             '70. Fahavitan-tena amin\'ny fifindrana',
+    faneling_fivelomana:        "71. Tombanana firy isan-jato ny fanelingelenana amin'ny asa fivelomana",
+    miarina_pct:                '72. Fahafahana miarina ara-pivelomana raha voaelingelina ny asa',
+    // ── sec11 : Fananana ─────────────────────────────────────────
+    fanak_tany:                 '73. Tany',
+    fanak_trano:                '74. Trano',
+    // ── sec12 : Hazo ─────────────────────────────────────────────
+    hazo_j_letisia:             '75. Hazo tanora – Letisia',
+    hazo_j_letisia_nombre:      '75. Hazo tanora – Letisia (isa)',
+    hazo_j_zavoka:              '75. Hazo tanora – Zavoka',
+    hazo_j_zavoka_nombre:       '75. Hazo tanora – Zavoka (isa)',
+    hazo_j_voasary:             '75. Hazo tanora – Voasary',
+    hazo_j_voasary_nombre:      '75. Hazo tanora – Voasary (isa)',
+    hazo_j_manga:               '75. Hazo tanora – Manga',
+    hazo_j_manga_nombre:        '75. Hazo tanora – Manga (isa)',
+    hazo_j_paiso:               '75. Hazo tanora – Paiso',
+    hazo_j_paiso_nombre:        '75. Hazo tanora – Paiso (isa)',
+    hazo_j_rotra:               '75. Hazo tanora – Rotra',
+    hazo_j_rotra_nombre:        '75. Hazo tanora – Rotra (isa)',
+    hazo_j_goavy:               '75. Hazo tanora – Goavy',
+    hazo_j_goavy_nombre:        '75. Hazo tanora – Goavy (isa)',
+    hazo_j_kininina:            '75. Hazo tanora – Kininina',
+    hazo_j_kininina_nombre:     '75. Hazo tanora – Kininina (isa)',
+    hazo_j_kesika:              '75. Hazo tanora – Kesika',
+    hazo_j_kesika_nombre:       '75. Hazo tanora – Kesika (isa)',
+    hazo_j_acacia:              '75. Hazo tanora – Acacia',
+    hazo_j_acacia_nombre:       '75. Hazo tanora – Acacia (isa)',
+    hazo_j_hafa:                '75. Hazo tanora – Hafa',
+    hazo_j_hafa_nombre:         '75. Hazo tanora – Hafa (isa)',
+    hazo_v_letisia:             '76. Hazo vaventy – Letisia',
+    hazo_v_letisia_nombre:      '76. Hazo vaventy – Letisia (isa)',
+    hazo_v_zavoka:              '76. Hazo vaventy – Zavoka',
+    hazo_v_zavoka_nombre:       '76. Hazo vaventy – Zavoka (isa)',
+    hazo_v_voasary:             '76. Hazo vaventy – Voasary',
+    hazo_v_voasary_nombre:      '76. Hazo vaventy – Voasary (isa)',
+    hazo_v_manga:               '76. Hazo vaventy – Manga',
+    hazo_v_manga_nombre:        '76. Hazo vaventy – Manga (isa)',
+    hazo_v_paiso:               '76. Hazo vaventy – Paiso',
+    hazo_v_paiso_nombre:        '76. Hazo vaventy – Paiso (isa)',
+    hazo_v_rotra:               '76. Hazo vaventy – Rotra',
+    hazo_v_rotra_nombre:        '76. Hazo vaventy – Rotra (isa)',
+    hazo_v_goavy:               '76. Hazo vaventy – Goavy',
+    hazo_v_goavy_nombre:        '76. Hazo vaventy – Goavy (isa)',
+    hazo_v_kininina:            '76. Hazo vaventy – Kininina',
+    hazo_v_kininina_nombre:     '76. Hazo vaventy – Kininina (isa)',
+    hazo_v_kesika:              '76. Hazo vaventy – Kesika',
+    hazo_v_kesika_nombre:       '76. Hazo vaventy – Kesika (isa)',
+    hazo_v_acacia:              '76. Hazo vaventy – Acacia',
+    hazo_v_acacia_nombre:       '76. Hazo vaventy – Acacia (isa)',
+    hazo_v_hafa:                '76. Hazo vaventy – Hafa',
+    hazo_v_hafa_nombre:         '76. Hazo vaventy – Hafa (isa)',
+    // ── sec13 : Faharefoana ───────────────────────────────────────
+    tsalama_ray:                "77. Toe-pahasalaman'ny raim-pianakaviana",
+    tsalama_reny:               "78. Toe-pahasalaman'ny renim-pianakaviana",
+    isan_sembanana:             '79. Isan\'ny olona tra-pahasembanana',
+    semb_batana:                '80. Karazam-pahasembanana – Sembana ara-batana',
+    semb_tsaina:                '80. Karazam-pahasembanana – Sembana ara-tsaina',
+    isan_bevohoka:              '81. Isan\'ny vehivay bevohoka',
+    herisetra:                  '82. Herisetra mihantra amin\'ny vehivavy',
+    her_batana:                 '83. Karazan\'ny herisetra – Herisetra ara-batana',
+    her_moraly:                 '83. Karazan\'ny herisetra – Herisetra ara-moraly',
+    her_bola:                   '83. Karazan\'ny herisetra – Herisetra ara-bola sy fitantanana',
+    her_hafa:                   '83. Karazan\'ny herisetra – Hafa',
+    her_vady:                   '84. Olona iharan\'ny herisetra – Vady',
+    her_zanaka:                 '84. Olona iharan\'ny herisetra – Zanaka',
+    fiat_tsy_toky:              '85. Fomba fisehon\'ny fiatraikan\'ny herisetra – Tsy fahatokisa-tena',
+    fiat_zadam:                 '85. Fomba fisehon\'ny fiatraikan\'ny herisetra – Fivarina lavo amin\'ny zava-mahadomelina',
+    fiat_loka:                  '85. Fomba fisehon\'ny fiatraikan\'ny herisetra – Fiankinan-doha amin\'ny loka',
+    fiat_hafa:                  '85. Fomba fisehon\'ny fiatraikan\'ny herisetra – Hafa',
+    fitarain_tsy_misy:          '86. Fitarainana sy fizarana – Tsy misy',
+    fitarain_namana:            '86. Fitarainana sy fizarana – Namana sy fiarahamonina',
+    fitarain_havana:            '86. Fitarainana sy fizarana – Havana',
+    fitarain_fikamb:            '86. Fitarainana sy fizarana – Fikambanana',
+    fitarain_hafa:              '86. Fitarainana sy fizarana – Hafa',
+    fitarain_aiza:              '86. Fitarainana sy fizarana – Aiza (Fikambanana)?',
+    fitarain_inona:             '86. Fitarainana sy fizarana – Inona (Fikambanana)?',
+    hevitra_87:                 '87. Hevitra manokana hanatsarana ny fiainana',
+    // ── sec14 : Tan-tsoroka ───────────────────────────────────────
+    tans_tsy_misy:              '88. Tan-tsoroka – a) Tsy misy fa efa mety',
+    tans_fanofanana:            '88. Tan-tsoroka – b) Fanofanana arak\'asa',
+    tans_lalambarotra:          '88. Tan-tsoroka – c) Fanampiana amin\'ny fitadiavana lalam-barotra',
+    tans_hafa:                  '88. Tan-tsoroka – d) Hafa',
+    // ── sec15 : Fanonerana ────────────────────────────────────────
+    fandravana:                 '89. Mahakasika ny fandravana',
+    fanonerana:                 '90. Fanonerana safidiana',
+    antony_safidy:              "91. Anton'ny safidy",
+    // ── sec16 : Fitarainana ───────────────────────────────────────
+    fitarain_boaty:             '92. Ireo fomba fanangonana fitarainana – a) Boaty fitarainana',
+    fitarain_boky:              '92. Ireo fomba fanangonana fitarainana – b) Boky fitarainana',
+    fitarain_olona:             '92. Ireo fomba fanangonana fitarainana – c) Olona hitarainana',
+    fomba_fifanar:              '93. Fomba hifanarahana amin\'ny tetikasa',
+    fanamarihana_94:            '94. Fanamarihina, fanahiana, soso-kevitra',
+    // ── sec17 : Documents ─────────────────────────────────────────
+    documents:                  '17. Documents annexés',
+    // ── sec18 : Sonia ─────────────────────────────────────────────
+    date_signature:             'Daty (Sonia)',
+    lieu_signature:             'Toerana (Sonia)',
+    signatures:                 'Sonia'
+  };
+
   function submitForm() {
     // Check if signatures are present
     const hasEnqueteurSig = signatures.sigEnqueteur.data !== null;
@@ -3625,25 +3980,128 @@
       };
     });
 
-    // Always include all signatures (even if empty)
-    Object.keys(signatures).forEach(id => {
-      formData['signature_' + id] = signatures[id].data || null;
-    });
-
-    // Add metadata
-    formData._metadata = {
-      submissionDate: new Date().toISOString(),
-      submissionDateLocal: new Date().toLocaleString('mg-MG'),
-      formVersion: '1.0',
-      formName: 'PRODUIR 2 - Fanadihadiana',
-      enqueteur: sessionStorage.getItem('fullName') || sessionStorage.getItem('username') || 'inconnu'
+    // Build structured export data grouped by form section
+    const pickKeys = (keys) => {
+      const result = {};
+      keys.forEach(k => { if (Object.prototype.hasOwnProperty.call(formData, k)) result[k] = formData[k]; });
+      return result;
     };
 
-    console.log('Form data:', JSON.stringify(formData, null, 2));
+    const exportData = {
+      metadata: {
+        submissionDate: new Date().toISOString(),
+        submissionDateLocal: new Date().toLocaleString('mg-MG'),
+        formVersion: '2.1',
+        formName: 'PRODUIR 2 - Fanadihadiana',
+        enqueteur: sessionStorage.getItem('fullName') || sessionStorage.getItem('username') || 'inconnu'
+      },
+      questions: (() => {
+        const q = {};
+        // All labeled fields
+        Object.keys(FIELD_LABELS).forEach(key => {
+          const raw = formData[key];
+          q[key] = {
+            libelle: FIELD_LABELS[key],
+            valeur: (raw === undefined || raw === null) ? '' : raw
+          };
+        });
+        // Any extra formData keys not yet in FIELD_LABELS
+        Object.keys(formData).forEach(key => {
+          if (!q[key] && !key.startsWith('_') && key !== 'household_members' && key !== 'attached_documents') {
+            q[key] = { libelle: key, valeur: formData[key] };
+          }
+        });
+        // household members & documents as structured arrays
+        q.household_members = { libelle: '24. Membres du ménage', valeur: formData.household_members || [] };
+        q.attached_documents = { libelle: 'Documents annexés', valeur: formData.attached_documents || [] };
+        return q;
+      })(),
+      data: {
+        sec0_identification: pickKeys(['daty','distrika','kaomina','fokontany','kaody_renirano','laharana_fisy']),
+        sec1_pap: (() => {
+          const pap = pickKeys(['anarana','fanampiny','taona','fananahana','fanambadiana','laharana_kp','daty_kp','toerana_kp','daty_duplicata','toerana_duplicata','finday']);
+          // Vady (Q9–13b) — toujours présent (vide si non marié)
+          pap.vady = pickKeys(['anarana_vady','taona_vady','kp_vady','daty_kp_vady','toerana_kp_vady','daty_duplicata_vady','toerana_duplicata_vady']);
+          // Toerana voakasika (Q15–17)
+          pap.toerana_voakasika = pickKeys(['gps_x','gps_y','gps_precision']);
+          return pap;
+        })(),
+        sec2_fahafantarana: (() => {
+          const sec2 = pickKeys(['fantatra_tetikasa']);
+          // Q18–23 — toujours présent (vide si non concerné)
+          sec2.details_tetikasa = pickKeys(['inona_tetikasa','ho_an_iza','aiza','ahoana','fantatra_vokatra']);
+          sec2.details_tetikasa.vokatra_inona = formData.vokatra_inona || '';
+          return sec2;
+        })(),
+        sec3_tokatrano: {
+          ...pickKeys(['kilasy','mamaky']),
+          membres_menage: formData.household_members || []
+        },
+        sec4_fanabeazana: (() => {
+          const sec4 = pickKeys(['isan_ankizy_sekoly_taona']);
+          // Q28 : nombre par niveau scolaire
+          sec4.miditra_sekoly = {
+            fototra:  { coché: formData.miditra_fototra  || false, isa: formData.miditra_fototra_nb  || '' },
+            faharoa:  { coché: formData.miditra_faharoa  || false, isa: formData.miditra_faharoa_nb  || '' },
+            ambony:   { coché: formData.miditra_ambony   || false, isa: formData.miditra_ambony_nb   || '' }
+          };
+          // Q29a/29b
+          Object.assign(sec4, pickKeys(['ray_fari','reny_fari']));
+          // Q30 : montant par niveau
+          sec4.vola_fanabeazana = {
+            fototra:  { coché: formData.vola_fototra  || false, montant_ar: formData.vola_fototra_mt  || '' },
+            faharoa:  { coché: formData.vola_faharoa  || false, montant_ar: formData.vola_faharoa_mt  || '' },
+            ambony:   { coché: formData.vola_ambony   || false, montant_ar: formData.vola_ambony_mt   || '' }
+          };
+          // Q31
+          Object.assign(sec4, pickKeys(['famp_fototra','famp_faharoa','famp_ambony']));
+          // Q32 : distance par niveau
+          sec4.elanelan_sekoly = {
+            fototra:  { coché: formData.elan_fototra  || false, distance_km: formData.elan_fototra_km  || '' },
+            faharoa:  { coché: formData.elan_faharoa  || false, distance_km: formData.elan_faharoa_km  || '' },
+            ambony:   { coché: formData.elan_ambony   || false, distance_km: formData.elan_ambony_km   || '' }
+          };
+          return sec4;
+        })(),
+        sec5_fahasalamana: pickKeys(['aretina1','aretina1_fahavaratra','aretina1_ririnina','aretina1_mandava','aretina1_note','aretina2','aretina2_fahavaratra','aretina2_ririnina','aretina2_mandava','aretina2_note','aretina3','aretina3_fahavaratra','aretina3_ririnina','aretina3_mandava','aretina3_note','tsab_tsy_misy','tsab_nentim','tsab_mpanent','tsab_csb','tsab_hopitaly','tsab_tsy_miank','fitsab_pct','elan_fitsab']),
+        sec6_tolotra_fototra: pickKeys(['rano_paompy_trano','rano_paompy_iomb','rano_lavadrano_man','rano_lavadrano_iomb','rano_loharano','rano_renirano','maloto_trano','maloto_iomb','maloto_ankal','maloto_amoron','diov_trano','diov_iomb','diov_renirano','jiro_jirama','jiro_masoandro','jiro_torche','jiro_labozia','jiro_petrole','jiro_tsy_misy','afand_arina','afand_herin','afand_kitay','afand_entona']),
+        sec7_vola: (() => {
+          const sec7 = pickKeys(['vola_f_tsy_misy','vola_f_mamboly','vola_f_mivarotra','vola_f_mpanjono','vola_f_miasa_ori','vola_f_asa_tanana','vola_f_biriky','vola_f_fasika','vola_f_antselika','vola_f_hafa','vola_a_tsy_misy','vola_a_mamboly','vola_a_mivarotra','vola_a_mpanjono','vola_a_miasa_ori','vola_a_asa_tanana','vola_a_biriky','vola_a_fasika','vola_a_antselika','vola_a_hafa','vola_miditra','fand_sakafo','fand_sakafo_taha','fand_fahasalamana','fand_fahasalamana_taha','fand_fanabeazana','fand_fanabeazana_taha','fand_trano','fand_trano_taha','fand_fitafiana','fand_fitafiana_taha','fand_hafa','fand_hafa_taha']);
+          // Q46 + Q47/Q48 — toujours présent
+          sec7.tahiry = formData.tahiry || '';
+          sec7.tahiry_pct = formData.tahiry_pct || '';
+          sec7.tsy_tahiry_antony = formData.tsy_tahiry_antony || '';
+          Object.assign(sec7, pickKeys(['fitahiry','fndram_tsy_misy','fndram_banky','fndram_mpamp','fndram_microf','fndram_varymaitso','fndram_mobile','fndram_hafa']));
+          return sec7;
+        })(),
+        sec8_tany: pickKeys(['tany_tokotany','tany_voajary','tany_sasatra','tany_tanimbary','voly_vary','voly_ananana','voly_mangahazo','voly_katsaka','voly_vomanga','voly_legioma','refin_tany_total','refin_tany_voak','tar_titra','tar_kadasitra','tar_karatany','tar_tsy_misy','mpampiasa_tany','fifanar_tany','vesatra_renirano','vesatra_fefiloha','vesatra_zotry','vesatra_hafa','tombam_tany']),
+        sec9_trano: pickKeys(['trano_fonenana','trano_fivarotana_l','trano_fivarotana_m','trano_hafa','trano_taona','trano_rihana','trano_efitrano','mat_vato','mat_biriky','mat_hazo','mat_vy','mat_hafa','refin_trano_total','refin_trano_voak','tombam_trano']),
+        sec10_fanelingelenana: pickKeys(['faneling_fianakaviana','fifindrana_pct','faneling_fivelomana','miarina_pct']),
+        sec11_fananana: pickKeys(['fanak_tany','fanak_trano']),
+        sec12_hazo: pickKeys(Object.keys(FIELD_LABELS).filter(k => k.startsWith('hazo_'))),
+        sec13_faharefoana: pickKeys(['tsalama_ray','tsalama_reny','isan_sembanana','isan_bevohoka','semb_batana','semb_tsaina','herisetra','her_batana','her_moraly','her_bola','her_hafa','her_vady','her_zanaka','fiat_tsy_toky','fiat_zadam','fiat_loka','fiat_hafa','fitarain_tsy_misy','fitarain_namana','fitarain_havana','fitarain_fikamb','fitarain_hafa','fitarain_aiza','fitarain_inona','hevitra_87']),
+        sec14_tan_tsoroka: pickKeys(['tans_tsy_misy','tans_fanofanana','tans_lalambarotra','tans_hafa']),
+        sec15_fanonerana: pickKeys(['fandravana','fanonerana','antony_safidy']),
+        sec16_fitarainana: pickKeys(['fitarain_boaty','fitarain_boky','fitarain_olona','fomba_fifanar','fanamarihana_94']),
+        sec17_documents: {
+          documents: formData.attached_documents || []
+        },
+        sec18_sonia: {
+          date_signature: formData.date_signature || '',
+          lieu_signature: formData.lieu_signature || '',
+          signatures: {
+            enqueteur: signatures.sigEnqueteur?.data || null,
+            enquete: signatures.sigEnquete?.data || null
+          }
+        }
+      }
+    };
+
+    console.log('Export data:', JSON.stringify(exportData, null, 2));
 
     // Save to localStorage as backup
     try {
-      localStorage.setItem('produir2_last_submission', JSON.stringify(formData));
+      localStorage.setItem('produir2_last_submission', JSON.stringify(exportData));
       console.log('✅ Données sauvegardées dans localStorage');
     } catch (e) {
       console.error('❌ Erreur sauvegarde localStorage:', e);
@@ -3652,7 +4110,7 @@
     // Generate and download JSON file - with a small delay to ensure it works
     console.log('⏳ Démarrage du téléchargement JSON...');
     setTimeout(() => {
-      const success = saveFormAsJSON(formData);
+      const success = saveFormAsJSON(exportData);
       if (success) {
         console.log('✅ Téléchargement JSON terminé avec succès');
         
@@ -3669,16 +4127,19 @@
       } else {
         console.warn('⚠️ Problème lors du téléchargement JSON');
         
-        // Update error message
+        // Update error message in success screen
         setTimeout(() => {
           const icon = document.getElementById('jsonDownloadIcon');
           const title = document.getElementById('jsonDownloadTitle');
           const message = document.getElementById('jsonDownloadMessage');
           
-          if (icon) icon.textContent = '⚠️';
-          if (title) title.textContent = 'Problème de téléchargement';
-          if (message) message.textContent = 'Utilisez le bouton ci-dessous pour télécharger le fichier JSON manuellement.';
+          if (icon) icon.textContent = '❌';
+          if (title) title.textContent = 'Échec du téléchargement JSON';
+          if (message) message.textContent = 'Le fichier n\'a pas pu être sauvegardé automatiquement. Utilisez le bouton ci-dessous pour réessayer manuellement.';
         }, 500);
+
+        // Show toast error (alert already shown by saveFormAsJSON)
+        try { showToast('❌ Fichier JSON non téléchargé — réessayez manuellement', 'error'); } catch(e) {}
       }
     }, 300);
 
@@ -3698,8 +4159,8 @@
       const jsonString = JSON.stringify(formData, null, 2);
       console.log(`📝 JSON généré: ${jsonString.length} caractères`);
       
-      // Create blob with BOM for better compatibility
-      const blob = new Blob(['\ufeff', jsonString], { type: 'application/json;charset=utf-8' });
+      // Create blob without BOM
+      const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
       console.log('📦 Blob créé');
       
       // Generate filename with timestamp
@@ -3709,8 +4170,12 @@
       // Get username from session
       const username = sessionStorage.getItem('username') || 'user';
       
-      // Get Laharana Fisy from form data
-      const laharanaFisy = (formData.laharana_fisy || 'NOFISY').toString().replace(/[^a-zA-Z0-9]/g, '');
+      // Get Laharana Fisy from form data (flat format or structured v2 format)
+      const laharanaFisy = (
+        formData.laharana_fisy ||
+        (formData.data && formData.data.sec0_identification && formData.data.sec0_identification.laharana_fisy) ||
+        'NOFISY'
+      ).toString().replace(/[^a-zA-Z0-9]/g, '');
       
       // Clean username for filename (remove special characters)
       const cleanUsername = username.replace(/[^a-zA-Z0-9]/g, '');
@@ -3735,18 +4200,29 @@
         console.log('🖱️ Élément <a> ajouté au DOM');
         
         // Trigger download - try multiple methods
+        let downloadTriggered = false;
         try {
           a.click();
+          downloadTriggered = true;
           console.log('✅ Click() exécuté');
         } catch (clickError) {
           console.warn('⚠️ Click() échoué, essai avec dispatchEvent:', clickError);
-          const evt = new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            view: window
-          });
-          a.dispatchEvent(evt);
-          console.log('✅ dispatchEvent exécuté');
+          try {
+            const evt = new MouseEvent('click', {
+              bubbles: true,
+              cancelable: true,
+              view: window
+            });
+            a.dispatchEvent(evt);
+            downloadTriggered = true;
+            console.log('✅ dispatchEvent exécuté');
+          } catch (dispatchError) {
+            console.error('❌ dispatchEvent échoué:', dispatchError);
+          }
+        }
+
+        if (!downloadTriggered) {
+          throw new Error('Impossible de déclencher le téléchargement. Vérifiez que les pop-ups ne sont pas bloqués.');
         }
         
         // Cleanup with longer delay
@@ -3768,8 +4244,13 @@
       console.log(`✅ Fichier JSON téléchargé: ${filename}`);
       
       // Store filename for later reference
-      sessionStorage.setItem('last_json_filename', filename);
-      sessionStorage.setItem('last_json_data', jsonString);
+      try { sessionStorage.setItem('last_json_filename', filename); } catch(e) {}
+      try {
+        sessionStorage.setItem('last_json_data', jsonString);
+      } catch (quotaErr) {
+        // JSON too large for sessionStorage (images) — skip caching, download already done
+        console.warn('⚠️ sessionStorage quota dépassé pour last_json_data (images volumineuses) — ignoré');
+      }
       
       // Show success toast (safely)
       try {
@@ -3782,14 +4263,19 @@
     } catch (error) {
       console.error('❌ Erreur lors de la création du fichier JSON:', error);
       console.error('Stack trace:', error.stack);
-      
-      // Try to show error toast
+
+      const errMsg = `❌ Erreur de sauvegarde JSON\n\n${error.message}`;
+
+      // Always show alert so the user can't miss it
+      alert(errMsg);
+
+      // Also try toast for inline feedback
       try {
-        showToast('⚠️ Erreur lors de la sauvegarde du fichier JSON', 'error');
+        showToast(`❌ Échec de sauvegarde : ${error.message}`, 'error');
       } catch (toastError) {
-        alert('⚠️ Erreur lors de la sauvegarde du fichier JSON: ' + error.message);
+        // alert already shown above
       }
-      
+
       return false;
     }
   }
@@ -3873,8 +4359,53 @@
     const reader = new FileReader();
     reader.onload = function(e) {
       try {
-        const jsonData = JSON.parse(e.target.result);
-        console.log('📥 Chargement des données JSON:', jsonData);
+        const rawData = JSON.parse(e.target.result);
+        console.log('📥 Chargement des données JSON:', rawData);
+
+        // Flatten structured format (v2) back to flat object for form population
+        let jsonData;
+        const src = (rawData.metadata && rawData.data && rawData.data.sec0_identification)
+          ? rawData.data   // v2.1 envelope with 'data' key
+          : (rawData.metadata && rawData.sec0_identification)
+            ? rawData      // v2.0 flat sections at root
+            : null;
+
+        if (src) {
+          // New structured format — flatten all field sections
+          jsonData = {};
+          const sectionKeys = [
+            'sec0_identification','sec1_pap','sec2_fahafantarana',
+            'sec4_fanabeazana','sec5_fahasalamana','sec6_tolotra_fototra',
+            'sec7_vola','sec8_tany','sec9_trano','sec10_fanelingelenana',
+            'sec11_fananana','sec12_hazo','sec13_faharefoana','sec14_tan_tsoroka',
+            'sec15_fanonerana','sec16_fitarainana'
+          ];
+          sectionKeys.forEach(sk => { if (src[sk]) Object.assign(jsonData, src[sk]); });
+          // sec3: fields + members
+          if (src.sec3_tokatrano) {
+            const s3 = src.sec3_tokatrano;
+            if (s3.kilasy !== undefined) jsonData.kilasy = s3.kilasy;
+            if (s3.mamaky !== undefined) jsonData.mamaky = s3.mamaky;
+            jsonData.household_members = s3.membres_menage || [];
+          }
+          // sec17: documents
+          if (src.sec17_documents) {
+            jsonData.attached_documents = src.sec17_documents.documents || [];
+          }
+          // sec18: signature fields + signature data
+          if (src.sec18_sonia) {
+            const s18 = src.sec18_sonia;
+            if (s18.date_signature !== undefined) jsonData.date_signature = s18.date_signature;
+            if (s18.lieu_signature !== undefined) jsonData.lieu_signature = s18.lieu_signature;
+            if (s18.signatures) {
+              jsonData.signature_sigEnqueteur = s18.signatures.enqueteur || null;
+              jsonData.signature_sigEnquete  = s18.signatures.enquete  || null;
+            }
+          }
+        } else {
+          // Old flat format
+          jsonData = rawData;
+        }
 
         // Populate all text, number, and textarea fields
         Object.keys(jsonData).forEach(key => {
@@ -3939,7 +4470,7 @@
         }
 
         // Load documents
-        if (jsonData.attached_documents && Array.isArray(jsonData.attached_documents)) {
+        if (jsonData.attached_documents && Array.isArray(jsonData.attached_documents) && jsonData.attached_documents.length > 0) {
           // Clear existing documents
           const documentsContainer = document.getElementById('documents-container');
           if (documentsContainer) {
@@ -3948,78 +4479,87 @@
           documentsData = [];
           documentIdCounter = 0;
 
-          // Group documents by docId to handle multiple images per document
-          const docGroups = {};
+          // Group documents by original docId, preserving insertion order
+          const docGroupsMap = new Map();
           jsonData.attached_documents.forEach(doc => {
-            if (!docGroups[doc.docId]) {
-              docGroups[doc.docId] = [];
-            }
-            docGroups[doc.docId].push(doc);
+            const key = String(doc.docId);
+            if (!docGroupsMap.has(key)) docGroupsMap.set(key, []);
+            docGroupsMap.get(key).push(doc);
           });
 
-          // Add each document group
-          Object.keys(docGroups).forEach((docIdStr, groupIndex) => {
-            setTimeout(() => {
-              const docs = docGroups[docIdStr];
-              const firstDoc = docs[0];
-              
-              // Create document container
-              addDocumentItem();
-              const currentDocId = documentIdCounter;
-              
-              // Set document type
-              setTimeout(() => {
-                const typeSelect = document.querySelector(`select[name="doc_${currentDocId}_type"]`);
-                if (typeSelect && firstDoc.type) {
-                  typeSelect.value = firstDoc.type;
-                  
-                  // Show "autre" input if needed
-                  if (firstDoc.type === 'autre') {
-                    const autreInput = document.getElementById(`doc_${currentDocId}_autre_input`);
-                    if (autreInput) {
-                      autreInput.style.display = 'block';
-                      const autreDescInput = document.querySelector(`input[name="doc_${currentDocId}_autre_desc"]`);
-                      if (autreDescInput && firstDoc.autreDesc) {
-                        autreDescInput.value = firstDoc.autreDesc;
-                      }
-                    }
+          // Add each document group synchronously (no setTimeout needed – pure DOM ops)
+          docGroupsMap.forEach((docs, docIdStr) => {
+            const firstDoc = docs[0];
+
+            // Create document container (increments documentIdCounter)
+            addDocumentItem();
+            const currentDocId = documentIdCounter;
+
+            // Set document type
+            const typeSelect = document.querySelector(`select[name="doc_${currentDocId}_type"]`);
+            if (typeSelect && firstDoc.type) {
+              typeSelect.value = firstDoc.type;
+
+              // Show "autre" input if needed
+              if (firstDoc.type === 'autre') {
+                const autreInput = document.getElementById(`doc_${currentDocId}_autre_input`);
+                if (autreInput) {
+                  autreInput.style.display = 'block';
+                  const autreDescInput = document.querySelector(`input[name="doc_${currentDocId}_autre_desc"]`);
+                  if (autreDescInput && firstDoc.autreDesc) {
+                    autreDescInput.value = firstDoc.autreDesc;
                   }
                 }
-                
-                // Add all images for this document
-                const previewDiv = document.getElementById(`preview_${currentDocId}`);
-                if (previewDiv) {
-                  docs.forEach((doc, imgIndex) => {
-                    // Add to documentsData
-                    documentsData.push({
-                      docId: currentDocId,
-                      imgId: doc.imgId || `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${imgIndex}`,
-                      type: doc.type,
-                      autreDesc: doc.autreDesc || '',
-                      data: doc.data,
-                      fileName: doc.fileName,
-                      fileSize: doc.fileSize,
-                      fileType: doc.fileType
-                    });
-                    
-                    // Create preview element
-                    const previewItem = document.createElement('div');
-                    previewItem.className = 'document-preview-item';
-                    previewItem.setAttribute('data-img-id', doc.imgId);
-                    
-                    previewItem.innerHTML = `
-                      <img src="${doc.data}" alt="${doc.fileName || 'Document'}">
-                      <button class="remove-doc" onclick="removeDocumentImage('${doc.imgId}')" type="button">✕</button>
-                    `;
-                    
-                    previewDiv.appendChild(previewItem);
-                  });
-                  
-                  console.log(`✅ Document ${currentDocId} chargé avec ${docs.length} image(s)`);
-                }
-              }, 50);
-            }, 100 * groupIndex);
+              }
+            }
+
+            // Add all images for this document
+            const previewDiv = document.getElementById(`preview_${currentDocId}`);
+            if (previewDiv) {
+              docs.forEach((doc, imgIndex) => {
+                if (!doc.data) return; // skip if no image data
+
+                const imgId = doc.imgId || `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${imgIndex}`;
+
+                // Register in documentsData
+                documentsData.push({
+                  docId: currentDocId,
+                  imgId: imgId,
+                  type: doc.type || firstDoc.type || '',
+                  autreDesc: doc.autreDesc || '',
+                  data: doc.data,
+                  fileName: doc.fileName || '',
+                  fileSize: doc.fileSize || 0,
+                  fileType: doc.fileType || ''
+                });
+
+                // Create preview element
+                const previewItem = document.createElement('div');
+                previewItem.className = 'document-preview-item';
+                previewItem.setAttribute('data-img-id', imgId);
+
+                const img = document.createElement('img');
+                img.src = doc.data;
+                img.alt = doc.fileName || 'Document';
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-doc';
+                removeBtn.type = 'button';
+                removeBtn.textContent = '✕';
+                removeBtn.onclick = () => removeDocumentImage(imgId);
+
+                previewItem.appendChild(img);
+                previewItem.appendChild(removeBtn);
+                previewDiv.appendChild(previewItem);
+              });
+
+              console.log(`✅ Document ${currentDocId} chargé avec ${docs.size || docs.length} image(s)`);
+            } else {
+              console.warn(`⚠️ preview_${currentDocId} introuvable`);
+            }
           });
+
+          console.log(`✅ ${docGroupsMap.size} document(s) chargé(s) depuis JSON`);
         }
 
         // Load signatures
@@ -4051,34 +4591,44 @@
           }
         });
 
-        // After a delay, trigger cascade updates for dependent fields
-        setTimeout(() => {
-          // Trigger distrika change to populate kaomina
+        // Trigger cascade distrika → kaomina → fokontany
+        // Wait for excelData (async fetch may still be in progress)
+        const runJsonCascade = () => {
           const distrikaSelect = document.querySelector('[name="distrika"]');
           if (distrikaSelect && distrikaSelect.value) {
             distrikaSelect.dispatchEvent(new Event('change'));
-            
-            // Then trigger kaomina change to populate fokontany
             setTimeout(() => {
               const kaominaSelect = document.getElementById('kaomina');
               if (kaominaSelect && jsonData.kaomina) {
                 kaominaSelect.value = jsonData.kaomina;
                 kaominaSelect.dispatchEvent(new Event('change'));
-                
-                // Then set fokontany
                 setTimeout(() => {
                   const fokontanySelect = document.getElementById('fokontany');
                   if (fokontanySelect && jsonData.fokontany) {
                     fokontanySelect.value = jsonData.fokontany;
+                    console.log('✅ Fokontany restauré depuis JSON:', jsonData.fokontany);
                   }
-                }, 200);
+                }, 300);
               }
-            }, 200);
+            }, 300);
           }
-
           // Update percentage if section 7 has data
           updatePercentageStatus();
-        }, 500);
+          // Refresh nav buttons
+          render();
+        };
+
+        if (excelData) {
+          setTimeout(runJsonCascade, 300);
+        } else {
+          // Poll until excelData is ready
+          const jsonCascadeWait = setInterval(() => {
+            if (excelData) {
+              clearInterval(jsonCascadeWait);
+              runJsonCascade();
+            }
+          }, 200);
+        }
 
         showToast('✅ Angona tao anaty fichier JSON dia nampidirina tamin\'ny alàlan\'ny formulaire', 'success');
         console.log('✅ Données chargées avec succès');
@@ -4935,6 +5485,125 @@
   
   // Initialize conditional inputs
   initConditionalTahaInputs();
+
+  // ══ Q9-13b : afficher seulement si Q5 = Manambady ══
+  function toggleVadySection() {
+    const vadySection = document.getElementById('vady-section');
+    if (!vadySection) return;
+    const checked = document.querySelector('input[name="fanambadiana"]:checked');
+    const isManambady = checked && checked.value === 'Manambady';
+    vadySection.style.display = isManambady ? '' : 'none';
+    if (!isManambady) {
+      vadySection.querySelectorAll('input').forEach(el => {
+        if (el.type === 'radio' || el.type === 'checkbox') el.checked = false;
+        else el.value = '';
+      });
+    }
+  }
+
+  document.querySelectorAll('input[name="fanambadiana"]').forEach(radio => {
+    radio.addEventListener('change', toggleVadySection);
+  });
+  toggleVadySection(); // état initial
+
+  // ══ Q18-23 : afficher seulement si Q17 = Eny ══
+  function toggleFantatraTetikasa() {
+    const checked = document.querySelector('input[name="fantatra_tetikasa"]:checked');
+    const show = checked && checked.value === 'Eny';
+    const block = document.getElementById('fantatra-tetikasa-details');
+    if (!block) return;
+    block.style.display = show ? '' : 'none';
+    if (!show) {
+      block.querySelectorAll('input').forEach(el => {
+        if (el.type === 'radio' || el.type === 'checkbox') el.checked = false;
+        else el.value = '';
+      });
+      const vBlock = document.getElementById('fantatra-vokatra-details');
+      if (vBlock) vBlock.style.display = 'none';
+    }
+  }
+
+  // ══ Q23 : afficher seulement si Q22 = Eny ══
+  function toggleFantatraVokatra() {
+    const checked = document.querySelector('input[name="fantatra_vokatra"]:checked');
+    const show = checked && checked.value === 'Eny';
+    const block = document.getElementById('fantatra-vokatra-details');
+    if (!block) return;
+    block.style.display = show ? '' : 'none';
+    if (!show) {
+      block.querySelectorAll('input[type="text"], textarea').forEach(el => { el.value = ''; });
+    }
+  }
+
+  document.querySelectorAll('input[name="fantatra_tetikasa"]').forEach(r => r.addEventListener('change', toggleFantatraTetikasa));
+  document.querySelectorAll('input[name="fantatra_vokatra"]').forEach(r => r.addEventListener('change', toggleFantatraVokatra));
+  toggleFantatraTetikasa();
+  toggleFantatraVokatra();
+
+  // ══ Q28 : afficher un champ nombre pour chaque case cochée ══
+  function toggleQ28Number(checkbox, numberId) {
+    const numEl = document.getElementById(numberId);
+    if (!numEl) return;
+    numEl.style.display = checkbox.checked ? 'inline-block' : 'none';
+    if (!checkbox.checked) numEl.value = '';
+  }
+
+  // Initialiser l'état au chargement / après restauration de brouillon
+  function initQ28Numbers() {
+    [['miditra_fototra','miditra_fototra_nb'],['miditra_faharoa','miditra_faharoa_nb'],['miditra_ambony','miditra_ambony_nb']].forEach(([cbId, nbId]) => {
+      const cb = document.getElementById(cbId);
+      if (cb) toggleQ28Number(cb, nbId);
+    });
+  }
+  initQ28Numbers();
+
+  // ══ Q30 : afficher un montant pour chaque case cochée ══
+  function toggleQ30Amount(checkbox, amountId) {
+    const el = document.getElementById(amountId);
+    if (!el) return;
+    el.style.display = checkbox.checked ? 'inline-block' : 'none';
+    if (!checkbox.checked) el.value = '';
+  }
+
+  function initQ30Amounts() {
+    [['vola_fototra','vola_fototra_mt'],['vola_faharoa','vola_faharoa_mt'],['vola_ambony','vola_ambony_mt']].forEach(([cbId, amtId]) => {
+      const cb = document.getElementById(cbId);
+      if (cb) toggleQ30Amount(cb, amtId);
+    });
+  }
+  initQ30Amounts();
+
+  // ══ Q32 : afficher une distance pour chaque case cochée ══
+  function toggleQ32Distance(checkbox, distId) {
+    const el = document.getElementById(distId);
+    if (!el) return;
+    el.style.display = checkbox.checked ? 'inline-block' : 'none';
+    if (!checkbox.checked) el.value = '';
+  }
+
+  function initQ32Distances() {
+    [['elan_fototra','elan_fototra_km'],['elan_faharoa','elan_faharoa_km'],['elan_ambony','elan_ambony_km']].forEach(([cbId, distId]) => {
+      const cb = document.getElementById(cbId);
+      if (cb) toggleQ32Distance(cb, distId);
+    });
+  }
+  initQ32Distances();
+
+  // ══ Q47/Q48 : afficher selon Q46 (tahiry Eny/Tsia) ══
+  function toggleTahiry() {
+    const checked = document.querySelector('input[name="tahiry"]:checked');
+    const val = checked ? checked.value : null;
+    const enyBlock  = document.getElementById('tahiry-eny');
+    const tsiaBlock = document.getElementById('tahiry-tsia');
+    if (enyBlock)  enyBlock.style.display  = (val === 'eny')  ? '' : 'none';
+    if (tsiaBlock) tsiaBlock.style.display = (val === 'tsia') ? '' : 'none';
+    if (val !== 'eny' && enyBlock)
+      enyBlock.querySelectorAll('input').forEach(el => { if (el.type === 'radio') el.checked = false; else el.value = ''; });
+    if (val !== 'tsia' && tsiaBlock)
+      tsiaBlock.querySelectorAll('input[type="text"], textarea').forEach(el => { el.value = ''; });
+  }
+  document.querySelectorAll('input[name="tahiry"]').forEach(r => r.addEventListener('change', toggleTahiry));
+  toggleTahiry();
 
   // ══ SIGNATURE FUNCTIONALITY ══
   const signatures = {
@@ -5967,6 +6636,9 @@
     Object.keys(signatures).forEach(id => {
       formData['_signature_' + id] = signatures[id].data || null;
     });
+
+    // Save attached documents (base64 image data)
+    formData._documents = documentsData.length > 0 ? documentsData : [];
     
     // Save current section
     formData._currentSection = current;
@@ -5975,31 +6647,71 @@
     return formData;
   }
 
-  // Function to save draft to localStorage
+  // ══ INDEXEDDB HELPERS (stockage illimité pour le brouillon) ══
+  const IDB_NAME    = 'produir2_idb';
+  const IDB_STORE   = 'drafts';
+  const IDB_DKEY    = 'current_draft';
+
+  function _idbOpen() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(IDB_NAME, 1);
+      req.onupgradeneeded = e => e.target.result.createObjectStore(IDB_STORE);
+      req.onsuccess  = e => resolve(e.target.result);
+      req.onerror    = e => reject(e.target.error);
+    });
+  }
+  function _idbPut(data) {
+    return _idbOpen().then(db => new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).put(data, IDB_DKEY);
+      tx.oncomplete = () => resolve();
+      tx.onerror    = e => reject(e.target.error);
+    }));
+  }
+  function _idbGet() {
+    return _idbOpen().then(db => new Promise((resolve, reject) => {
+      const tx  = db.transaction(IDB_STORE, 'readonly');
+      const req = tx.objectStore(IDB_STORE).get(IDB_DKEY);
+      req.onsuccess = e => resolve(e.target.result);
+      req.onerror   = e => reject(e.target.error);
+    }));
+  }
+  function _idbDelete() {
+    return _idbOpen().then(db => new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).delete(IDB_DKEY);
+      tx.oncomplete = () => resolve();
+      tx.onerror    = e => reject(e.target.error);
+    }));
+  }
+
+  // Function to save draft to IndexedDB (+ tiny localStorage flag)
   function saveDraft() {
     try {
       const formData = collectFormData();
-      localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(formData));
-      
-      // Show saved indicator
-      showAutosaveIndicator('saved');
-      
-      console.log('✅ Brouillon sauvegardé:', new Date().toLocaleTimeString());
+      _idbPut(formData)
+        .then(() => {
+          // Keep a lightweight flag in localStorage so hasDraft check works synchronously
+          localStorage.setItem(AUTOSAVE_KEY, '1');
+          showAutosaveIndicator('saved');
+          console.log('✅ Brouillon sauvegardé (IndexedDB):', new Date().toLocaleTimeString());
+        })
+        .catch(err => {
+          // IndexedDB unavailable → fallback to localStorage without images
+          console.error('❌ IndexedDB indisponible, fallback localStorage:', err);
+          try {
+            const slim = {...formData, _documents: (formData._documents || []).map(d => ({...d, data: null}))};
+            localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(slim));
+          } catch (e) { /* quota même sans images – on ignore */ }
+          showAutosaveIndicator('saved');
+        });
     } catch (error) {
       console.error('❌ Erreur lors de la sauvegarde:', error);
     }
   }
 
-  // Function to restore draft from localStorage
-  function restoreDraft() {
-    try {
-      const saved = localStorage.getItem(AUTOSAVE_KEY);
-      if (!saved) {
-        console.log('ℹ️ Aucun brouillon trouvé');
-        return false;
-      }
-      
-      const formData = JSON.parse(saved);
+  // Internal: apply formData object onto the form
+  function _applyFormData(formData) {
       let restored = 0;
       let fieldsCount = 0;
       
@@ -6027,10 +6739,79 @@
               img.src = formData[key];
               fieldsCount++;
             }
+          } else if (key === '_documents') {
+            // Restore attached documents
+            const docsToRestore = formData[key];
+            if (Array.isArray(docsToRestore) && docsToRestore.length > 0) {
+              const documentsContainer = document.getElementById('documents-container');
+              if (documentsContainer) documentsContainer.innerHTML = '';
+              documentsData = [];
+              documentIdCounter = 0;
+
+              const docGroupsMap = new Map();
+              docsToRestore.forEach(doc => {
+                const k = String(doc.docId);
+                if (!docGroupsMap.has(k)) docGroupsMap.set(k, []);
+                docGroupsMap.get(k).push(doc);
+              });
+
+              docGroupsMap.forEach((docs) => {
+                const firstDoc = docs[0];
+                addDocumentItem();
+                const currentDocId = documentIdCounter;
+
+                const typeSelect = document.querySelector(`select[name="doc_${currentDocId}_type"]`);
+                if (typeSelect && firstDoc.type) {
+                  typeSelect.value = firstDoc.type;
+                  if (firstDoc.type === 'autre') {
+                    const autreInput = document.getElementById(`doc_${currentDocId}_autre_input`);
+                    if (autreInput) {
+                      autreInput.style.display = 'block';
+                      const autreDescInput = document.querySelector(`input[name="doc_${currentDocId}_autre_desc"]`);
+                      if (autreDescInput && firstDoc.autreDesc) autreDescInput.value = firstDoc.autreDesc;
+                    }
+                  }
+                }
+
+                const previewDiv = document.getElementById(`preview_${currentDocId}`);
+                if (previewDiv) {
+                  docs.forEach((doc, imgIndex) => {
+                    if (!doc.data) return;
+                    const imgId = doc.imgId || `img_${Date.now()}_${Math.random().toString(36).substr(2,9)}_${imgIndex}`;
+                    documentsData.push({
+                      docId: currentDocId,
+                      imgId: imgId,
+                      type: doc.type || firstDoc.type || '',
+                      autreDesc: doc.autreDesc || '',
+                      data: doc.data,
+                      fileName: doc.fileName || '',
+                      fileSize: doc.fileSize || 0,
+                      fileType: doc.fileType || ''
+                    });
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'document-preview-item';
+                    previewItem.setAttribute('data-img-id', imgId);
+                    const imgEl = document.createElement('img');
+                    imgEl.src = doc.data;
+                    imgEl.alt = doc.fileName || 'Document';
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'remove-doc';
+                    removeBtn.type = 'button';
+                    removeBtn.textContent = '✕';
+                    removeBtn.onclick = () => removeDocumentImage(imgId);
+                    previewItem.appendChild(imgEl);
+                    previewItem.appendChild(removeBtn);
+                    previewDiv.appendChild(previewItem);
+                    fieldsCount++;
+                  });
+                }
+              });
+              console.log(`✅ ${docGroupsMap.size} document(s) restauré(s) depuis le brouillon`);
+            }
           }
-          return; // Skip other meta fields
+          return; // Skip other meta fields (_currentSection, _timestamp, etc.)
         }
-        
+
         const elements = document.getElementsByName(key);
         elements.forEach(el => {
           if (el.type === 'checkbox') {
@@ -6055,30 +6836,95 @@
         current = formData._currentSection;
         render();
       }
-      
+
+      // Trigger cascade distrika → kaomina → fokontany after draft restore
+      // (select options are dynamic and not restored by setting .value alone)
+      const savedDistrika  = formData.distrika;
+      const savedKaomina   = formData.kaomina;
+      const savedFokontany = formData.fokontany;
+      if (savedDistrika) {
+        const runDraftCascade = () => {
+          const distrikaSelect = document.querySelector('[name="distrika"]');
+          if (distrikaSelect) {
+            distrikaSelect.value = savedDistrika;
+            distrikaSelect.dispatchEvent(new Event('change'));
+            setTimeout(() => {
+              const kaominaSelect = document.getElementById('kaomina');
+              if (kaominaSelect && savedKaomina) {
+                kaominaSelect.value = savedKaomina;
+                kaominaSelect.dispatchEvent(new Event('change'));
+                setTimeout(() => {
+                  const fokontanySelect = document.getElementById('fokontany');
+                  if (fokontanySelect && savedFokontany) {
+                    fokontanySelect.value = savedFokontany;
+                    console.log('✅ Fokontany restauré depuis brouillon:', savedFokontany);
+                  }
+                }, 300);
+              }
+            }, 300);
+          }
+        };
+        if (excelData) {
+          setTimeout(runDraftCascade, 300);
+        } else {
+          const draftCascadeWait = setInterval(() => {
+            if (excelData) {
+              clearInterval(draftCascadeWait);
+              runDraftCascade();
+            }
+          }, 200);
+        }
+      }
+
       if (fieldsCount > 0) {
         const timestamp = formData._timestamp ? new Date(formData._timestamp).toLocaleString('mg-MG') : 'inconnu';
         console.log(`📋 Brouillon restauré: ${fieldsCount} champs (${timestamp})`);
-        
-        // Show notification
         showAutosaveIndicator('restored');
-        
-        // Show toast notification
+        // Re-evaluate conditional visibility after draft restore
+        if (typeof toggleVadySection === 'function') toggleVadySection();
+        if (typeof toggleFantatraTetikasa === 'function') toggleFantatraTetikasa();
+        if (typeof toggleFantatraVokatra === 'function') toggleFantatraVokatra();
+        if (typeof initQ28Numbers === 'function') initQ28Numbers();
+        if (typeof initQ30Amounts === 'function') initQ30Amounts();
+        if (typeof initQ32Distances === 'function') initQ32Distances();
+        if (typeof toggleTahiry === 'function') toggleTahiry();
         try {
           const sectionName = sectionTitles[current] || 'Fizarana ' + current;
           showToast(`📋 Brouillon restauré: ${fieldsCount} champs • ${sectionName}`, 'success');
-        } catch (e) {
-          console.warn('Toast non disponible:', e);
-        }
-        
+        } catch (e) { console.warn('Toast non disponible:', e); }
         return true;
       }
-      
       return false;
-    } catch (error) {
-      console.error('❌ Erreur lors de la restauration:', error);
-      return false;
-    }
+  }
+
+  // Function to restore draft – returns a Promise<boolean>
+  function restoreDraft() {
+    return _idbGet()
+      .then(formData => {
+        if (!formData) {
+          // Fallback: try localStorage (old format or slim fallback)
+          const saved = localStorage.getItem(AUTOSAVE_KEY);
+          if (!saved || saved === '1') {
+            console.log('ℹ️ Aucun brouillon trouvé');
+            return false;
+          }
+          try { formData = JSON.parse(saved); } catch(e) { return false; }
+        }
+        console.log('🔄 Restauration du brouillon depuis IndexedDB...');
+        return _applyFormData(formData);
+      })
+      .catch(err => {
+        console.error('❌ Erreur IndexedDB restoreDraft:', err);
+        // Fallback localStorage
+        try {
+          const saved = localStorage.getItem(AUTOSAVE_KEY);
+          if (saved && saved !== '1') {
+            const formData = JSON.parse(saved);
+            return _applyFormData(formData);
+          }
+        } catch(e) {}
+        return false;
+      });
   }
 
   // Function to show autosave indicator
@@ -6148,12 +6994,9 @@
 
   // Function to clear draft
   function clearDraft() {
-    try {
-      localStorage.removeItem(AUTOSAVE_KEY);
-      console.log('🗑️ Brouillon supprimé');
-    } catch (error) {
-      console.error('❌ Erreur lors de la suppression:', error);
-    }
+    localStorage.removeItem(AUTOSAVE_KEY);
+    _idbDelete().catch(e => console.warn('IDB delete:', e));
+    console.log('🗑️ Brouillon supprimé');
   }
 
   // Clear draft on successful submission
@@ -6203,15 +7046,11 @@
     console.log('⏳ Chargement du brouillon prévu dans 1 seconde...');
     setTimeout(() => {
       console.log('🔄 Tentative de restauration du brouillon...');
-      const restored = restoreDraft();
-      if (!restored && hasDraft) {
-        console.warn('⚠️ Brouillon détecté mais non restauré');
-      } else if (!restored) {
-        console.log('ℹ️ Aucun brouillon à restaurer - nouveau formulaire');
-      }
-      
-      // Set today's date if not already set (after draft restoration)
-      setTimeout(() => setTodayDate(), 200);
+      restoreDraft().then(restored => {
+        if (!restored && hasDraft) console.warn('⚠️ Brouillon détecté mais non restauré');
+        else if (!restored) console.log('ℹ️ Aucun brouillon à restaurer - nouveau formulaire');
+        setTimeout(() => setTodayDate(), 200);
+      });
     }, 1000);
   }
 
@@ -6223,7 +7062,7 @@
     
     // Simple credentials (you can modify these or use a more secure method)
     const validCredentials = [
-      { username: 'admin', password: 'produir2024', fullName: 'Administrateur' },
+      { username: 'admin', password: 'admin123', fullName: 'Administrateur' },
       { username: 'belinda', password: 'enquete123', fullName: 'RANDRIAMIHAJA Belinda' },
       { username: 'angelica', password: 'enquete123', fullName: 'FITSAHARANA HASIMPIDERANA Onjaniaina Angelica Michelle' },
       { username: 'narindra', password: 'enquete123', fullName: 'RAZAFIMAHEFA Holy Narindra' },
@@ -6266,18 +7105,17 @@
       console.log('⏳ Chargement du brouillon prévu dans 1 seconde...');
       setTimeout(() => {
         console.log('🔄 Tentative de restauration du brouillon après connexion...');
-        const restored = restoreDraft();
         const hasSavedDraft = localStorage.getItem(AUTOSAVE_KEY) !== null;
-        if (!restored && hasSavedDraft) {
-          console.warn('⚠️ Brouillon détecté mais non restauré');
-          showToast('⚠️ Problème de restauration du brouillon', 'error');
-        } else if (!restored) {
-          console.log('ℹ️ Nouveau formulaire - aucun brouillon');
-          showToast('📝 Nouveau formulaire', 'info');
-        }
-        
-        // Set today's date if not already set (after draft restoration)
-        setTimeout(() => setTodayDate(), 200);
+        restoreDraft().then(restored => {
+          if (!restored && hasSavedDraft) {
+            console.warn('⚠️ Brouillon détecté mais non restauré');
+            showToast('⚠️ Problème de restauration du brouillon', 'error');
+          } else if (!restored) {
+            console.log('ℹ️ Nouveau formulaire - aucun brouillon');
+            showToast('📝 Nouveau formulaire', 'info');
+          }
+          setTimeout(() => setTodayDate(), 200);
+        });
       }, 1000);
     } else {
       // Show error message
