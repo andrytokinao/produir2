@@ -2,7 +2,7 @@
 // db.php - Database connection for backoffice
 // Update credentials as needed for your XAMPP environment
 
-$DB_HOST = '127.0.0.1';
+$DB_HOST = '192.168.1.5';
 $DB_NAME = 'produir2_db';
 $DB_USER = 'root';
 $DB_PASS = 'admin';
