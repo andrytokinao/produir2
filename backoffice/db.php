@@ -4,8 +4,8 @@
 
 $DB_HOST = '192.168.1.5';
 $DB_NAME = 'produir2_db';
-$DB_USER = 'root';
-$DB_PASS = 'admin';
+$DB_USER = 'best_data';
+$DB_PASS = 'VA32@TanambaO';
 
 try {
     $pdo = new PDO("mysql:host=$DB_HOST;dbname=$DB_NAME;charset=utf8mb4", $DB_USER, $DB_PASS, [
