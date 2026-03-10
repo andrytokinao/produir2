@@ -4318,11 +4318,10 @@
       { name: 'laharana_kp',       label: 'Q6 – Laharana kara-panondro',            section: 1 },
       { name: 'gps_x',             label: 'Q15 – GPS X (Longitude)',                section: 1 },
       { name: 'gps_y',             label: 'Q16 – GPS Y (Latitude)',                 section: 1 },
-      // SEC1 – conditionnels Manambady
+      // SEC1 – conditionnels Manambady (Q11 kp_vady exclu : non obligatoire)
       ...(isManambady ? [
-        { name: 'anarana_vady', label: 'Q9 – Anarana sy fanampiny ny vady',         section: 1 },
-        { name: 'taona_vady',   label: 'Q10 – Taona (vady)',                        section: 1 },
-        { name: 'kp_vady',      label: 'Q11 – Laharana kara-panondro (vady)',       section: 1 },
+        { name: 'anarana_vady', label: 'Q9 – Anarana sy fanampiny ny vady',   section: 1 },
+        { name: 'taona_vady',   label: 'Q10 – Taona (vady)',                  section: 1 },
       ] : []),
       // SEC2 – Fahafantarana
       { name: 'fantatra_tetikasa', label: 'Q17 – Fantatra ve ny tetikasa?',         section: 2, type: 'radio' },
@@ -4466,10 +4465,10 @@
       { name: 'fanambadiana',       label: 'Q5 – Fanambadiana',                      type: 'radio' },
       { name: 'gps_x',              label: 'Q15 – GPS X (Longitude)',                type: 'text'  },
       { name: 'gps_y',              label: 'Q16 – GPS Y (Latitude)',                 type: 'text'  },
+      // Q11 kp_vady : non obligatoire (exclu)
       ...(isManambady ? [
-        { name: 'anarana_vady',     label: 'Q9 – Anarana sy fanampiny ny vady',      type: 'text'  },
-        { name: 'taona_vady',       label: 'Q10 – Taona (vady)',                     type: 'text'  },
-        { name: 'kp_vady',          label: 'Q11 – Laharana kara-panondro (vady)',    type: 'text'  },
+        { name: 'anarana_vady', label: 'Q9 – Anarana sy fanampiny ny vady', type: 'text' },
+        { name: 'taona_vady',   label: 'Q10 – Taona (vady)',                type: 'text' },
       ] : []),
       // SEC2
       { name: 'fantatra_tetikasa',  label: 'Q17 – Fantatra ve ny tetikasa?',         type: 'radio' },
@@ -5698,14 +5697,21 @@
         else el.value = '';
       });
     }
-    // Conditionnellement obligatoires : Q9 (anarana_vady), Q10 (taona_vady), Q11 (kp_vady)
-    ['anarana_vady', 'taona_vady', 'kp_vady'].forEach(n => {
+    // Q9/Q10 (vady) : conditionnellement obligatoires si Manambady
+    ['anarana_vady', 'taona_vady'].forEach(n => {
       const el = document.querySelector('[name="' + n + '"]');
       if (!el) return;
       const label = el.closest('.field')?.querySelector(':scope > label');
       if (label) label.classList.toggle('req', isManambady);
       el.required = isManambady;
     });
+    // Q11 (kp_vady) : jamais obligatoire
+    const kpVady = document.querySelector('[name="kp_vady"]');
+    if (kpVady) {
+      kpVady.required = false;
+      const kpLabel = kpVady.closest('.field')?.querySelector(':scope > label');
+      if (kpLabel) kpLabel.classList.remove('req');
+    }
   }
 
   document.querySelectorAll('input[name="fanambadiana"]').forEach(radio => {
