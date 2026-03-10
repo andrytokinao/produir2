@@ -4091,8 +4091,8 @@
 
     // Generate and download JSON file - with a small delay to ensure it works
     console.log('⏳ Démarrage du téléchargement JSON...');
-    setTimeout(() => {
-      const success = saveFormAsJSON(exportData);
+    setTimeout(async () => {
+      const success = await saveFormAsJSON(exportData);
       if (success) {
         console.log('✅ Téléchargement JSON terminé avec succès');
         
@@ -4133,7 +4133,7 @@
     pctLabel.textContent = '100%';
   }
 
-  function saveFormAsJSON(formData) {
+  async function saveFormAsJSON(formData) {
     console.log('🔄 Début de saveFormAsJSON...');
     
     try {
@@ -4151,76 +4151,60 @@
       
       // Get username from session
       const username = sessionStorage.getItem('username') || 'user';
-      
-      // Get Laharana Fisy from form data (flat format or structured v2 format)
-      const laharanaFisy = (
-        formData.laharana_fisy ||
-        (formData.data && formData.data.sec0_identification && formData.data.sec0_identification.laharana_fisy) ||
-        'NOFISY'
-      ).toString().replace(/[^a-zA-Z0-9]/g, '');
-      
-      // Clean username for filename (remove special characters)
-      const cleanUsername = username.replace(/[^a-zA-Z0-9]/g, '');
-      
-      const filename = `PRODUIR2_${cleanUsername}_Fanadihadiana_${laharanaFisy}_${timestamp}.json`;
+
+      const _c = s => (s || '').toString().replace(/[^a-zA-Z0-9\u00C0-\u024F]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+      // Lecture depuis la structure imbriquée (exportData.data.sec0, sec1) ou flat (brouillon)
+      const _sec0 = (formData.data && formData.data.sec0_identification) || formData;
+      const _sec1 = (formData.data && formData.data.sec1_pap)           || formData;
+      const cleanUsername = _c(username);
+      const kaodyRenirano = _c(_sec0.kaody_renirano);
+      const laharanaFisy  = _c(_sec0.laharana_fisy) || 'NOFISY';
+      const anarana       = _c(_sec1.anarana);
+      const fanampiny     = _c(_sec1.fanampiny);
+      const fokontany     = _c(_sec0.fokontany);
+      const kaomina       = _c(_sec0.kaomina);
+      const datyRaw       = (_sec0.daty || '').replace(/\//g, '');
+
+      const filename = `PRODUIR2_${cleanUsername}_${kaodyRenirano}_${laharanaFisy}_${anarana}_${fanampiny}_${fokontany}_${kaomina}_${datyRaw}.json`;
       console.log(`📄 Nom de fichier: ${filename}`);
       
-      // Check if browser supports download attribute
-      const supportsDownload = 'download' in document.createElement('a');
-      console.log(`🔍 Support download: ${supportsDownload}`);
-      
-      if (supportsDownload) {
-        // Modern browsers
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.style.cssText = 'display:none;position:absolute;left:-9999px;';
-        
-        // Add to DOM
-        document.body.appendChild(a);
-        console.log('🖱️ Élément <a> ajouté au DOM');
-        
-        // Trigger download - try multiple methods
-        let downloadTriggered = false;
-        try {
-          a.click();
-          downloadTriggered = true;
-          console.log('✅ Click() exécuté');
-        } catch (clickError) {
-          console.warn('⚠️ Click() échoué, essai avec dispatchEvent:', clickError);
-          try {
-            const evt = new MouseEvent('click', {
-              bubbles: true,
-              cancelable: true,
-              view: window
-            });
-            a.dispatchEvent(evt);
-            downloadTriggered = true;
-            console.log('✅ dispatchEvent exécuté');
-          } catch (dispatchError) {
-            console.error('❌ dispatchEvent échoué:', dispatchError);
-          }
-        }
+      // Si le nom de fichier a changé, réinitialiser le handle
+      if (_finalFilename && _finalFilename !== filename) _finalFileHandle = null;
+      _finalFilename = filename;
 
-        if (!downloadTriggered) {
-          throw new Error('Impossible de déclencher le téléchargement. Vérifiez que les pop-ups ne sont pas bloqués.');
+      if (window.showSaveFilePicker && _finalFileHandle) {
+        // Même session → écraser silencieusement
+        const writable = await _finalFileHandle.createWritable();
+        await writable.write(jsonString);
+        await writable.close();
+      } else if (window.showSaveFilePicker) {
+        // Première fois → laisser l'utilisateur choisir l'emplacement
+        try {
+          _finalFileHandle = await window.showSaveFilePicker({
+            suggestedName: filename,
+            types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
+          });
+          const writable = await _finalFileHandle.createWritable();
+          await writable.write(jsonString);
+          await writable.close();
+        } catch (e) {
+          if (e.name === 'AbortError') return true; // utilisateur a annulé
+          throw e;
         }
-        
-        // Cleanup with longer delay
-        setTimeout(() => {
-          try {
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            console.log('🧹 Nettoyage effectué');
-          } catch (cleanupError) {
-            console.warn('⚠️ Erreur nettoyage:', cleanupError);
-          }
-        }, 2000);
       } else {
-        // Fallback for older browsers
-        console.log('📱 Utilisation du fallback pour navigateurs anciens');
-        window.open('data:application/json;charset=utf-8,' + encodeURIComponent(jsonString));
+        // Fallback classique (Firefox, Safari…)
+        const supportsDownload = 'download' in document.createElement('a');
+        if (supportsDownload) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; a.download = filename;
+          a.style.cssText = 'display:none;position:absolute;left:-9999px;';
+          document.body.appendChild(a);
+          try { a.click(); } catch(ce) { a.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,view:window})); }
+          setTimeout(() => { try { document.body.removeChild(a); URL.revokeObjectURL(url); } catch(e){} }, 2000);
+        } else {
+          window.open('data:application/json;charset=utf-8,' + encodeURIComponent(jsonString));
+        }
       }
       
       console.log(`✅ Fichier JSON téléchargé: ${filename}`);
@@ -4463,6 +4447,8 @@
   // Handle retenu pour écraser le même fichier brouillon (File System Access API)
   let _brouillonFileHandle = null;
   let _brouillonFilename   = null;
+  let _finalFileHandle = null;
+  let _finalFilename   = null;
 
   async function exportBrouillon() {
     // Validation des champs obligatoires fizarana 1 et 2 (sauf Q6 laharana_kp)
@@ -4604,7 +4590,7 @@
           }
           // sec17: documents
           if (src.sec17_documents) {
-            jsonData.attached_documents = src.sec17_documents.documents || [];
+            jsonData.attached_documents = src.sec17_documents.attached_documents || src.sec17_documents.documents || [];
           }
           // sec18: signature fields + signature data
           if (src.sec18_sonia) {
@@ -4617,8 +4603,12 @@
             }
           }
         } else {
-          // Old flat format
+          // Old flat format or brouillon
           jsonData = rawData;
+          // Brouillon stores documents under _documents instead of attached_documents
+          if (!jsonData.attached_documents && jsonData._documents && Array.isArray(jsonData._documents)) {
+            jsonData.attached_documents = jsonData._documents;
+          }
         }
 
         // Populate all text, number, and textarea fields
