@@ -1,9 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="mg">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fanadihadiana – PRODUIR 2</title>
+<!-- Leaflet CSS/JS pour carte GPS interactive -->
+<link rel="stylesheet" href="libs/leaflet/leaflet.css">
+<script src="libs/leaflet/leaflet.js"></script>
 <!-- Offline mode: Using system fonts instead of Google Fonts -->
 <style>
   :root {
@@ -317,6 +320,13 @@
     color: var(--primary);
     margin-right: 8px; flex-shrink: 0;
   }
+  .field label.req::after {
+    content: " *";
+    color: #e53e3e;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 1;
+  }
 
   input[type="text"],
   input[type="number"],
@@ -596,6 +606,13 @@
     color: #fff;
   }
   .btn-submit:hover { background: #b87830; transform: translateY(-1px); }
+  .btn-brouillon {
+    background: #6366f1;
+    color: #fff;
+    font-size: 13px;
+    padding: 10px 18px;
+  }
+  .btn-brouillon:hover { background: #4f46e5; transform: translateY(-1px); }
 
   /* ── SUCCESS ── */
   .success-screen {
@@ -998,322 +1015,137 @@
     box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
   }
 
-  /* ── GPS MAP CONTAINER ── */
-  /* ── GPS MODAL POPUP ── */
+  /* ── GPS MODAL (style FSRP) ── */
   .gps-modal {
+    display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: fadeIn 0.3s ease-out;
+    z-index: 10000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    overflow: auto;
+    animation: fadeIn 0.3s ease-in-out;
   }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  .gps-modal-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    animation: fadeIn 0.3s ease-out;
-  }
-
   .gps-modal-content {
-    position: relative;
+    background-color: #fff;
+    margin: 2% auto;
+    padding: 0;
+    border-radius: 12px;
     width: 90%;
-    max-width: 700px;
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-    overflow: hidden;
-    animation: slideUp 0.4s ease-out;
-    z-index: 1;
+    max-width: 1000px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    animation: slideDown 0.3s ease-out;
   }
-
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(50px) scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
+  @keyframes slideDown {
+    from { transform: translateY(-50px); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
   }
-
   .gps-modal-header {
-    background: linear-gradient(145deg, #10b981, #059669);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 20px 24px;
+    padding: 20px 30px;
+    border-radius: 12px 12px 0 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
-
-  .modal-header-left {
+  .gps-modal-header h2 { margin: 0; font-size: 1.8em; font-weight: 600; }
+  .gps-close {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: none;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 45px; height: 45px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s ease;
+  }
+  .gps-close:hover { background: rgba(255,255,255,0.3); transform: rotate(90deg); }
+  .gps-modal-body { padding: 30px; }
+  .gps-status {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 500;
     display: flex;
     align-items: center;
     gap: 12px;
+    font-size: 1.05em;
   }
-
-  .modal-icon {
-    font-size: 28px;
-  }
-
-  .modal-title {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 20px;
-    font-weight: 700;
-    margin: 0;
-  }
-
-  .close-modal-btn {
-    background: rgba(255, 255, 255, 0.15);
-    border: none;
-    color: white;
-    width: 36px;
-    height: 36px;
+  .gps-status.acquiring { background: #e3f2fd; color: #1976d2; border-left: 4px solid #2196F3; }
+  .gps-status.success   { background: #e8f5e9; color: #2e7d32; border-left: 4px solid #4CAF50; }
+  .gps-status.error     { background: #ffebee; color: #c62828; border-left: 4px solid #f44336; }
+  .spinner {
+    border: 3px solid rgba(25,118,210,0.2);
+    border-top: 3px solid #1976d2;
     border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    font-size: 20px;
-    z-index: 100;
-    position: relative;
+    width: 20px; height: 20px;
+    animation: spin 1s linear infinite;
+    flex-shrink: 0;
   }
-
-  .close-modal-btn:hover {
-    background: rgba(255, 255, 255, 0.25);
-    transform: rotate(90deg);
-  }
-
-  .close-modal-btn:active {
-    transform: scale(0.9);
-  }
-
-  .gps-modal-body {
-    padding: 0;
-    position: relative;
-  }
-
-  .map-zoom-controls {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    z-index: 10;
-  }
-
-  .zoom-btn {
-    width: 40px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.95);
-    border: 2px solid #10b981;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    transition: all 0.2s;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  }
-
-  .zoom-btn:hover {
-    background: #10b981;
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-  }
-
-  .zoom-btn:active {
-    transform: scale(0.95);
-  }
-
-  .gps-map-image {
-    width: 100%;
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  #gpsMap {
     height: 400px;
-    background: #f3f4f6;
-    position: relative;
-    overflow: hidden;
-    cursor: move;
-  }
-
-  .gps-map-image.fullscreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 10000;
-    border-radius: 0;
-  }
-
-  .gps-map-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: transform 0.3s ease;
-  }
-
-  .gps-map-image.zoomed img {
-    object-fit: none;
-    cursor: grab;
-  }
-
-  .gps-map-image.zoomed img:active {
-    cursor: grabbing;
-  }
-
-  .map-loading {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #6b7280;
-    font-size: 15px;
-    font-weight: 500;
-    text-align: center;
-  }
-
-  .map-error {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    color: #374151;
-    padding: 20px;
-    width: 80%;
-  }
-
-  .gps-map-image .map-marker {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -100%);
-    font-size: 40px;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
-    animation: bounce 1.2s ease-in-out infinite;
-  }
-
-  @keyframes bounce {
-    0%, 100% { transform: translate(-50%, -100%) translateY(0); }
-    50% { transform: translate(-50%, -100%) translateY(-12px); }
-  }
-
-  .gps-modal-footer {
-    padding: 20px 24px;
-    background: linear-gradient(to bottom, #ffffff, #f9fafb);
-    border-top: 1px solid #e5e7eb;
-  }
-
-  .coord-display {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    gap: 20px;
-    margin-bottom: 12px;
-  }
-
-  .coord-item {
-    flex: 1;
-    text-align: center;
-  }
-
-  .coord-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: #059669;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
-  }
-
-  .coord-value {
-    display: block;
-    font-size: 18px;
-    font-weight: 700;
-    color: #1f2937;
-    font-family: 'Courier New', monospace;
-  }
-
-  .coord-divider {
-    width: 1px;
-    height: 40px;
-    background: #e5e7eb;
-  }
-
-  .accuracy-info {
-    text-align: center;
-    font-size: 13px;
-    color: #6b7280;
-    padding: 8px 12px;
-    background: #f3f4f6;
     border-radius: 8px;
-    font-weight: 500;
+    margin-bottom: 20px;
+    border: 2px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background: #e8eaf6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ctext y='45' font-size='40'%3E🗺️%3C/text%3E%3C/svg%3E") center/60px no-repeat;
   }
-
-  .reacquire-gps-btn {
-    width: 100%;
-    margin-top: 12px;
-    padding: 12px 20px;
-    background: linear-gradient(145deg, #3b82f6, #2563eb);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    font-family: 'DM Sans', sans-serif;
+  #accuracyIndicator {
+    padding: 12px 20px; border-radius: 8px; margin-bottom: 20px;
+    font-weight: 500; text-align: center;
   }
-
-  .reacquire-gps-btn:hover {
-    background: linear-gradient(145deg, #2563eb, #1d4ed8);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 12px rgba(59, 130, 246, 0.4);
+  .accuracy-indicator.accuracy-excellent { background: #e8f5e9; color: #2e7d32; border: 2px solid #4CAF50; }
+  .accuracy-indicator.accuracy-good      { background: #e3f2fd; color: #1565c0; border: 2px solid #2196F3; }
+  .accuracy-indicator.accuracy-fair      { background: #fff8e1; color: #f57f17; border: 2px solid #FFC107; }
+  .accuracy-indicator.accuracy-poor      { background: #ffebee; color: #c62828; border: 2px solid #f44336; }
+  .gps-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px; margin-bottom: 20px;
   }
-
-  .reacquire-gps-btn:active {
-    transform: translateY(0);
+  .gps-info-card {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 15px; border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
-
-  .reacquire-gps-btn:disabled {
-    background: #9ca3af;
-    cursor: not-allowed;
-    opacity: 0.6;
+  .gps-info-card label { display: block; font-size: 0.9em; color: #555; margin-bottom: 5px; font-weight: 600; }
+  .gps-info-card .value { font-size: 1.3em; color: #333; font-weight: 700; font-family: 'Courier New', monospace; }
+  #manualInputSection {
+    background: #f8f9fa; padding: 20px; border-radius: 8px;
+    margin-top: 20px; border: 2px dashed #dee2e6;
+    display: none;
   }
-
-  .reacquire-gps-btn .btn-icon {
-    font-size: 18px;
-    transition: transform 0.3s ease;
+  #manualInputSection.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+  #manualInputSection h3 { margin-top: 0; color: #495057; font-size: 1.2em; }
+  .gps-form-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;
   }
-
-  .reacquire-gps-btn:hover .btn-icon {
-    transform: scale(1.2);
+  .gps-form-group { display: flex; flex-direction: column; }
+  .gps-form-group label { font-weight: 600; margin-bottom: 5px; color: #495057; }
+  .gps-form-group input {
+    padding: 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 1em;
   }
+  .gps-modal-actions {
+    display: flex; gap: 15px; justify-content: flex-end;
+    padding: 20px 30px; border-top: 2px solid #e9ecef;
+  }
+  .gps-modal-actions button, .btn-primary, .btn-secondary {
+    padding: 12px 30px;
+    border: none; border-radius: 6px;
+    font-size: 1.05em; font-weight: 600;
+    cursor: pointer; transition: all 0.3s ease;
+  }
+  .btn-secondary { background: #6c757d; color: white; }
+  .btn-secondary:hover { background: #5a6268; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+  .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+  .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(102,126,234,0.4); }
+  .btn-primary:disabled { background: #cccccc; cursor: not-allowed; opacity: 0.6; }
 
-  /* ── KP ERROR MESSAGE ── */
+  /* ── GPS BUTTONS in form ── */
   .kp-error {
     margin-top: 8px;
     padding: 10px 14px;
@@ -1401,41 +1233,20 @@
     /* GPS Modal responsive */
     .gps-modal-content {
       width: 95%;
-      max-width: none;
-      margin: 10px;
+      margin: 4% auto;
     }
     .gps-modal-header {
-      padding: 16px 18px;
+      padding: 16px 20px;
     }
-    .modal-title {
-      font-size: 18px;
-    }
-    .modal-icon {
-      font-size: 24px;
-    }
-    .gps-map-image {
-      height: 300px;
-    }
-    .map-zoom-controls {
-      top: 8px;
-      right: 8px;
-      gap: 6px;
-    }
-    .zoom-btn {
-      width: 36px;
-      height: 36px;
-      font-size: 16px;
-    }
-    .coord-display {
+    .gps-modal-header h2 { font-size: 1.3em; }
+    #gpsMap { height: 280px; }
+    .gps-info-grid { grid-template-columns: 1fr; }
+    .gps-form-row { grid-template-columns: 1fr; }
+    .gps-modal-actions {
       flex-direction: column;
-      gap: 12px;
+      padding: 14px 16px;
     }
-    .coord-divider {
-      display: none;
-    }
-    .coord-value {
-      font-size: 16px;
-    }
+    .gps-modal-actions button { width: 100%; }
     
     /* GPS Buttons responsive */
     .gps-button,
@@ -1578,11 +1389,11 @@
     <div class="section-body">
       <div class="inline-group">
         <div class="field">
-          <label>Daty</label>
+          <label class="req">Daty</label>
           <input type="text" name="daty" placeholder="JJ/MM/AAAA" pattern="(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/[0-9]{4}" title="Format: JJ/MM/AAAA" required>
         </div>
         <div class="field">
-          <label>Distrika</label>
+          <label class="req">Distrika</label>
           <select name="distrika" required>
             <option value="">-- Safidio ny Distrika --</option>
             <option value="AMBOHIDRATRIMO">AMBOHIDRATRIMO</option>
@@ -1595,7 +1406,7 @@
           </select>
         </div>
         <div class="field">
-          <label>Kaomina</label>
+          <label class="req">Kaomina</label>
           <select name="kaomina" id="kaomina" required disabled>
             <option value="">-- Safidio ny Distrika aloha --</option>
           </select>
@@ -1603,19 +1414,19 @@
       </div>
       <div class="inline-group" style="margin-top:14px">
         <div class="field">
-          <label>Fokontany</label>
+          <label class="req">Fokontany</label>
           <select name="fokontany" id="fokontany" required disabled>
             <option value="">-- Safidio ny Kaomina aloha --</option>
           </select>
         </div>
         <div class="field">
-          <label>Kaody Renirano</label>
+          <label class="req">Kaody Renirano</label>
           <input type="text" name="kaody_renirano" placeholder="Kaody" required>
         </div>
       </div>
       <div class="inline-group" style="margin-top:14px">
         <div class="field">
-          <label>Laharan'ny fisy</label>
+          <label class="req">Laharan'ny fisy</label>
           <input type="text" name="laharana_fisy" placeholder="Laharan'ny fisy" required>
         </div>
       </div>
@@ -1641,42 +1452,42 @@
 
       <div class="inline-group">
         <div class="field">
-          <label><span class="q-num">1</span>Anarana</label>
-          <input type="text" name="anarana" placeholder="Anarana">
+          <label class="req"><span class="q-num">1</span>Anarana</label>
+          <input type="text" name="anarana" placeholder="Anarana" required style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
         </div>
         <div class="field">
           <label><span class="q-num">2</span>Fanampiny</label>
-          <input type="text" name="fanampiny" placeholder="Fanampiny">
+          <input type="text" name="fanampiny" placeholder="Fanampiny" style="text-transform:capitalize" oninput="this.value=this.value.replace(/\b\w/g,c=>c.toUpperCase())">
         </div>
       </div>
 
       <div class="inline-group">
         <div class="field">
-          <label><span class="q-num">3</span>Taona</label>
-          <input type="number" name="taona" placeholder="Taona" min="1" max="120">
+          <label class="req"><span class="q-num">3</span>Taona</label>
+          <input type="number" name="taona" placeholder="Taona" min="1" max="120" required>
         </div>
         <div class="field">
-          <label><span class="q-num">4</span>Fananahana</label>
+          <label class="req"><span class="q-num">4</span>Fananahana</label>
           <div class="choices">
-            <label class="choice-item"><input type="radio" name="fananahana" value="Lahy"> Lahy</label>
-            <label class="choice-item"><input type="radio" name="fananahana" value="Vavy"> Vavy</label>
+            <label class="choice-item"><input type="radio" name="fananahana" value="Lahy" required> Lahy</label>
+            <label class="choice-item"><input type="radio" name="fananahana" value="Vavy" required> Vavy</label>
           </div>
         </div>
       </div>
 
       <div class="field">
-        <label><span class="q-num">5</span>Fanambadiana</label>
+        <label class="req"><span class="q-num">5</span>Fanambadiana</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="fanambadiana" value="Manambady"> Manambady</label>
-          <label class="choice-item"><input type="radio" name="fanambadiana" value="Tsy manambady"> Tsy manambady</label>
-          <label class="choice-item"><input type="radio" name="fanambadiana" value="Nisara-bady"> Nisara-bady</label>
-          <label class="choice-item"><input type="radio" name="fanambadiana" value="Maty vady"> Maty vady</label>
+          <label class="choice-item"><input type="radio" name="fanambadiana" value="Manambady" required> Manambady</label>
+          <label class="choice-item"><input type="radio" name="fanambadiana" value="Tsy manambady" required> Tsy manambady</label>
+          <label class="choice-item"><input type="radio" name="fanambadiana" value="Nisara-bady" required> Nisara-bady</label>
+          <label class="choice-item"><input type="radio" name="fanambadiana" value="Maty vady" required> Maty vady</label>
         </div>
       </div>
 
       <div class="field">
-        <label><span class="q-num">6</span>Laharana kara-panondro</label>
-        <input type="text" name="laharana_kp" id="laharana_kp" placeholder="XXX XXX XXX XXX" inputmode="numeric" maxlength="15">
+        <label class="req"><span class="q-num">6</span>Laharana kara-panondro</label>
+        <input type="text" name="laharana_kp" id="laharana_kp" placeholder="XXX XXX XXX XXX" inputmode="numeric" maxlength="15" required>
         <div class="kp-error" id="kp_error" style="display:none;"></div>
       </div>
 
@@ -1758,12 +1569,12 @@
 
       <div class="inline-group">
         <div class="field">
-          <label><span class="q-num">15</span>Tondro GPS X (Longitude)</label>
-          <input type="text" name="gps_x" placeholder="GPS X" id="gpsXField">
+          <label class="req"><span class="q-num">15</span>Tondro GPS X (Longitude)</label>
+          <input type="text" name="gps_x" placeholder="GPS X" id="gpsXField" required readonly>
         </div>
         <div class="field">
-          <label><span class="q-num">16</span>Tondro GPS Y (Latitude)</label>
-          <input type="text" name="gps_y" placeholder="GPS Y" id="gpsYField">
+          <label class="req"><span class="q-num">16</span>Tondro GPS Y (Latitude)</label>
+          <input type="text" name="gps_y" placeholder="GPS Y" id="gpsYField" required readonly>
         </div>
         <div class="field">
           <label><span class="q-num">17</span>Précision GPS (mètres)</label>
@@ -1774,12 +1585,7 @@
             <button type="button" id="getGPSBtn" class="gps-button">
               <span class="gps-icon">📍</span> Obtenir ma position GPS
             </button>
-            <button type="button" id="manualGPSBtn" class="gps-button-manual" style="display: none;">
-              <span class="gps-icon">✏️</span> Saisie manuelle
-            </button>
           </div>
-          <div id="gpsStatus" class="gps-status"></div>
-          <div id="gpsPrecisionWarning" class="gps-precision-warning" style="display: none;"></div>
         </div>
       </div>
 
@@ -1795,9 +1601,9 @@
     <div class="section-body">
 
       <div class="field">
-        <label><span class="q-num">17</span>Fantantra ve ny tetikasa?</label>
+        <label class="req"><span class="q-num">17</span>Fantantra ve ny tetikasa?</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="fantatra_tetikasa" value="Eny"> Eny</label>
+          <label class="choice-item"><input type="radio" name="fantatra_tetikasa" value="Eny" required> Eny</label>
           <label class="choice-item"><input type="radio" name="fantatra_tetikasa" value="Tsia"> Tsia</label>
         </div>
       </div>
@@ -1853,7 +1659,7 @@
     <div class="section-body">
 
       <div class="field">
-        <label><span class="q-num">24</span>Fitsinjarana araky ny taona sy fananahana eo anivon'ny ankohonana</label>
+        <label class="req"><span class="q-num">24</span>Fitsinjarana araky ny taona sy fananahana eo anivon'ny ankohonana</label>
         <div style="overflow-x:auto; margin-top:10px">
           <table class="age-table">
             <thead>
@@ -1882,9 +1688,9 @@
       </div>
 
       <div class="field">
-        <label><span class="q-num">25</span>Kilasy nijanonan'ny PAP nianatra</label>
+        <label class="req"><span class="q-num">25</span>Kilasy nijanonan'ny PAP nianatra</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="kilasy" value="Tsy nianatra"> Tsy nianatra</label>
+          <label class="choice-item"><input type="radio" name="kilasy" value="Tsy nianatra" required> Tsy nianatra</label>
           <label class="choice-item"><input type="radio" name="kilasy" value="Fototra"> Ambaratonga fototra</label>
           <label class="choice-item"><input type="radio" name="kilasy" value="Faharoa"> Ambaratonga faharoa fototra</label>
           <label class="choice-item"><input type="radio" name="kilasy" value="Ambony"> Ambaratonga ambony</label>
@@ -1892,9 +1698,9 @@
       </div>
 
       <div class="field">
-        <label><span class="q-num">26</span>Mahay mamaky teny sy manoratra ve ny PAP?</label>
+        <label class="req"><span class="q-num">26</span>Mahay mamaky teny sy manoratra ve ny PAP?</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="mamaky" value="Eny"> Eny</label>
+          <label class="choice-item"><input type="radio" name="mamaky" value="Eny" required> Eny</label>
           <label class="choice-item"><input type="radio" name="mamaky" value="Tsia"> Tsia</label>
         </div>
       </div>
@@ -1919,15 +1725,15 @@
           <label><span class="q-num">28</span>Isan'ny ankizy miditra an-tsekoly</label>
           <div class="choices" style="margin-top:8px;flex-wrap:wrap;gap:10px">
             <label class="choice-item" style="align-items:center;gap:6px">
-              <input type="checkbox" name="miditra_fototra" id="miditra_fototra" onchange="toggleQ28Number(this,'miditra_fototra_nb')"> Fototra
+              <input type="checkbox" name="miditra_fototra" id="miditra_fototra" onchange="toggleQ28Number(this,'miditra_fototra_nb')"> Ambaratonga fototra
               <input type="number" name="miditra_fototra_nb" id="miditra_fototra_nb" min="0" placeholder="Isa" style="display:none;width:70px;margin-left:4px">
             </label>
             <label class="choice-item" style="align-items:center;gap:6px">
-              <input type="checkbox" name="miditra_faharoa" id="miditra_faharoa" onchange="toggleQ28Number(this,'miditra_faharoa_nb')"> Faharoa fototra
+              <input type="checkbox" name="miditra_faharoa" id="miditra_faharoa" onchange="toggleQ28Number(this,'miditra_faharoa_nb')"> Ambaratonga faharoa fototra
               <input type="number" name="miditra_faharoa_nb" id="miditra_faharoa_nb" min="0" placeholder="Isa" style="display:none;width:70px;margin-left:4px">
             </label>
             <label class="choice-item" style="align-items:center;gap:6px">
-              <input type="checkbox" name="miditra_ambony" id="miditra_ambony" onchange="toggleQ28Number(this,'miditra_ambony_nb')"> Ambony
+              <input type="checkbox" name="miditra_ambony" id="miditra_ambony" onchange="toggleQ28Number(this,'miditra_ambony_nb')"> Ambaratonga ambony
               <input type="number" name="miditra_ambony_nb" id="miditra_ambony_nb" min="0" placeholder="Isa" style="display:none;width:70px;margin-left:4px">
             </label>
           </div>
@@ -1938,8 +1744,8 @@
         <label><span class="q-num">29a</span>Fari-pahalalan'ny Ray (lahy)</label>
         <div class="choices">
           <label class="choice-item"><input type="radio" name="ray_fari" value="Ambaratonga fototra"> Ambaratonga fototra</label>
-          <label class="choice-item"><input type="radio" name="ray_fari" value="Faharoa fototra"> Faharoa fototra</label>
-          <label class="choice-item"><input type="radio" name="ray_fari" value="Ambony"> Ambony</label>
+          <label class="choice-item"><input type="radio" name="ray_fari" value="Faharoa fototra"> Ambaratonga faharoa fototra</label>
+          <label class="choice-item"><input type="radio" name="ray_fari" value="Ambony"> Ambaratonga ambony</label>
           <label class="choice-item"><input type="radio" name="ray_fari" value="Tsy nianatra"> Tsy nianatra</label>
         </div>
       </div>
@@ -1948,8 +1754,8 @@
         <label><span class="q-num">29b</span>Fari-pahalalan'ny Reny (vavy)</label>
         <div class="choices">
           <label class="choice-item"><input type="radio" name="reny_fari" value="Ambaratonga fototra"> Ambaratonga fototra</label>
-          <label class="choice-item"><input type="radio" name="reny_fari" value="Faharoa fototra"> Faharoa fototra</label>
-          <label class="choice-item"><input type="radio" name="reny_fari" value="Ambony"> Ambony</label>
+          <label class="choice-item"><input type="radio" name="reny_fari" value="Faharoa fototra"> Ambaratonga faharoa fototra</label>
+          <label class="choice-item"><input type="radio" name="reny_fari" value="Ambony"> Ambaratonga ambony</label>
           <label class="choice-item"><input type="radio" name="reny_fari" value="Tsy nianatra"> Tsy nianatra</label>
         </div>
       </div>
@@ -1962,11 +1768,11 @@
             <input type="number" name="vola_fototra_mt" id="vola_fototra_mt" min="0" placeholder="Ar" style="display:none;width:110px;margin-left:4px">
           </label>
           <label class="choice-item" style="align-items:center;gap:6px">
-            <input type="checkbox" name="vola_faharoa" id="vola_faharoa" onchange="toggleQ30Amount(this,'vola_faharoa_mt')"> Faharoa fototra
+            <input type="checkbox" name="vola_faharoa" id="vola_faharoa" onchange="toggleQ30Amount(this,'vola_faharoa_mt')"> Ambaratonga faharoa fototra
             <input type="number" name="vola_faharoa_mt" id="vola_faharoa_mt" min="0" placeholder="Ar" style="display:none;width:110px;margin-left:4px">
           </label>
           <label class="choice-item" style="align-items:center;gap:6px">
-            <input type="checkbox" name="vola_ambony" id="vola_ambony" onchange="toggleQ30Amount(this,'vola_ambony_mt')"> Ambony
+            <input type="checkbox" name="vola_ambony" id="vola_ambony" onchange="toggleQ30Amount(this,'vola_ambony_mt')"> Ambaratonga ambony
             <input type="number" name="vola_ambony_mt" id="vola_ambony_mt" min="0" placeholder="Ar" style="display:none;width:110px;margin-left:4px">
           </label>
         </div>
@@ -1976,8 +1782,8 @@
         <label><span class="q-num">31</span>Fahafahana mampiana-janaka</label>
         <div class="choices">
           <label class="choice-item"><input type="checkbox" name="famp_fototra"> Ambaratonga fototra</label>
-          <label class="choice-item"><input type="checkbox" name="famp_faharoa"> Faharoa fototra</label>
-          <label class="choice-item"><input type="checkbox" name="famp_ambony"> Ambony</label>
+          <label class="choice-item"><input type="checkbox" name="famp_faharoa"> Ambaratonga faharoa fototra</label>
+          <label class="choice-item"><input type="checkbox" name="famp_ambony"> Ambaratonga ambony</label>
         </div>
       </div>
 
@@ -1989,11 +1795,11 @@
             <input type="number" name="elan_fototra_km" id="elan_fototra_km" min="0" step="0.1" placeholder="km" style="display:none;width:90px;margin-left:4px">
           </label>
           <label class="choice-item" style="align-items:center;gap:6px">
-            <input type="checkbox" name="elan_faharoa" id="elan_faharoa" onchange="toggleQ32Distance(this,'elan_faharoa_km')"> Faharoa fototra
+            <input type="checkbox" name="elan_faharoa" id="elan_faharoa" onchange="toggleQ32Distance(this,'elan_faharoa_km')"> Ambaratonga faharoa fototra
             <input type="number" name="elan_faharoa_km" id="elan_faharoa_km" min="0" step="0.1" placeholder="km" style="display:none;width:90px;margin-left:4px">
           </label>
           <label class="choice-item" style="align-items:center;gap:6px">
-            <input type="checkbox" name="elan_ambony" id="elan_ambony" onchange="toggleQ32Distance(this,'elan_ambony_km')"> Ambony
+            <input type="checkbox" name="elan_ambony" id="elan_ambony" onchange="toggleQ32Distance(this,'elan_ambony_km')"> Ambaratonga ambony
             <input type="number" name="elan_ambony_km" id="elan_ambony_km" min="0" step="0.1" placeholder="km" style="display:none;width:90px;margin-left:4px">
           </label>
         </div>
@@ -2076,20 +1882,20 @@
       <div class="field">
         <label><span class="q-num">35</span>Fahafahana misitraka fitsaboana</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="fitsab_pct" value="inférieur à 25%"> &lt;25%</label>
+          <label class="choice-item"><input type="radio" name="fitsab_pct" value="inférieur à 25%"> Latsaky ny 25%</label>
           <label class="choice-item"><input type="radio" name="fitsab_pct" value="25-50%"> 25–50%</label>
           <label class="choice-item"><input type="radio" name="fitsab_pct" value="50-75%"> 50–75%</label>
-          <label class="choice-item"><input type="radio" name="fitsab_pct" value=">75%"> &gt;75%</label>
+          <label class="choice-item"><input type="radio" name="fitsab_pct" value="> 75%"> Mihoatra ny 75%</label>
         </div>
       </div>
 
       <div class="field">
         <label><span class="q-num">36</span>Elanelan'ny toeram-pitsaboana sy ny trano fonenana</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="elan_fitsab" value="inférieur à 5km"> &lt;5 km</label>
-          <label class="choice-item"><input type="radio" name="elan_fitsab" value="5-10 km"> 5–10 km</label>
-          <label class="choice-item"><input type="radio" name="elan_fitsab" value="10-15 km"> 10–15 km</label>
-          <label class="choice-item"><input type="radio" name="elan_fitsab" value=">15 km"> &gt;15 km</label>
+          <label class="choice-item"><input type="radio" name="elan_fitsab" value="inférieur à 5km"> Latsaky ny 5km</label>
+          <label class="choice-item"><input type="radio" name="elan_fitsab" value="5-10km"> 5–10km</label>
+          <label class="choice-item"><input type="radio" name="elan_fitsab" value="10-15km"> 10–15km</label>
+          <label class="choice-item"><input type="radio" name="elan_fitsab" value="> 15km"> Mihoatra ny 15km</label>
         </div>
       </div>
 
@@ -2169,7 +1975,7 @@
     <div class="section-body">
 
       <div class="field">
-        <label><span class="q-num">42</span>Loharanom-bola fototra</label>
+        <label class="req"><span class="q-num">42</span>Loharanom-bola fototra</label>
         <div class="choices vertical">
           <label class="choice-item"><input type="checkbox" name="vola_f_tsy_misy"> a) Tsy misy</label>
           <label class="choice-item"><input type="checkbox" name="vola_f_mamboly"> b) Mamboly sy miompy</label>
@@ -2185,7 +1991,7 @@
       </div>
 
       <div class="field">
-        <label><span class="q-num">43</span>Loharanom-bola fanampiny</label>
+        <label class="req"><span class="q-num">43</span>Loharanom-bola fanampiny</label>
         <div class="choices vertical">
           <label class="choice-item"><input type="checkbox" name="vola_a_tsy_misy"> a) Tsy misy</label>
           <label class="choice-item"><input type="checkbox" name="vola_a_mamboly"> b) Mamboly sy miompy</label>
@@ -2201,17 +2007,17 @@
       </div>
 
       <div class="field">
-        <label><span class="q-num">44</span>Vola miditra eo anivon'ny tokatrano isambolana</label>
+        <label class="req"><span class="q-num">44</span>Vola miditra eo anivon'ny tokatrano isambolana</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="vola_miditra" value="Latsaky ny 200.000 Ar"> &lt;200 000 Ar</label>
-          <label class="choice-item"><input type="radio" name="vola_miditra" value="200.000-500.000 Ar"> 200 000–500 000 Ar</label>
-          <label class="choice-item"><input type="radio" name="vola_miditra" value="500.000-1.000.000 Ar"> 500 000–1 000 000 Ar</label>
-          <label class="choice-item"><input type="radio" name="vola_miditra" value="Mihoatra ny 1.000.000 Ar"> &gt;1 000 000 Ar</label>
+          <label class="choice-item"><input type="radio" name="vola_miditra" value="Inférieur à 200.000Ar" required> Latsaky ny 200.000Ar</label>
+          <label class="choice-item"><input type="radio" name="vola_miditra" value="200.000-500.000Ar"> 200.000–500.000Ar</label>
+          <label class="choice-item"><input type="radio" name="vola_miditra" value="500.000-1.000.000Ar"> 500.000–1.000.000Ar</label>
+          <label class="choice-item"><input type="radio" name="vola_miditra" value="> 1.000.000Ar"> Mihoatra ny 1.000.000Ar</label>
         </div>
       </div>
 
       <div class="field">
-        <label><span class="q-num">45</span>Fandaniana eo anivon'ny tokatrano (%)</label>
+        <label class="req"><span class="q-num">45</span>Fandaniana eo anivon'ny tokatrano (%)</label>
         <div class="choices">
           <label class="choice-item"><input type="checkbox" name="fand_sakafo" data-target="fand_sakafo_taha"> Sakafo <input type="number" name="fand_sakafo_taha" class="conditional-input" min="0" max="100" placeholder="Taha (%)"></label>
           <label class="choice-item"><input type="checkbox" name="fand_fahasalamana" data-target="fand_fahasalamana_taha"> Fahasalamana <input type="number" name="fand_fahasalamana_taha" class="conditional-input" min="0" max="100" placeholder="Taha (%)"></label>
@@ -2228,9 +2034,9 @@
       </div>
 
       <div class="field">
-        <label><span class="q-num">46</span>Fahafahana manao tahiry</label>
+        <label class="req"><span class="q-num">46</span>Fahafahana manao tahiry</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="tahiry" value="Eny"> Eny</label>
+          <label class="choice-item"><input type="radio" name="tahiry" value="Eny" required> Eny</label>
           <label class="choice-item"><input type="radio" name="tahiry" value="Tsia"> Tsia</label>
         </div>
       </div>
@@ -2239,10 +2045,10 @@
         <div class="field">
           <label><span class="q-num">47</span>Raha Eny – Fahafahana manao tahiry (%)</label>
           <div class="choices">
-            <label class="choice-item"><input type="radio" name="tahiry_pct" value="Latsaky ny 25%"> &lt;25%</label>
+            <label class="choice-item"><input type="radio" name="tahiry_pct" value="Inférieur à 25%"> Latsaky ny 25%</label>
             <label class="choice-item"><input type="radio" name="tahiry_pct" value="25-50%"> 25–50%</label>
             <label class="choice-item"><input type="radio" name="tahiry_pct" value="50-75%"> 50–75%</label>
-            <label class="choice-item"><input type="radio" name="tahiry_pct" value="Mihoatra ny 75%"> &gt;75%</label>
+            <label class="choice-item"><input type="radio" name="tahiry_pct" value="> 75%"> Mihoatra ny 75%</label>
           </div>
         </div>
       </div>
@@ -2255,9 +2061,9 @@
       </div>
 
       <div class="field">
-        <label><span class="q-num">49</span>Fomba fitahirizana vola</label>
+        <label class="req"><span class="q-num">49</span>Fomba fitahirizana vola</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="fitahiry" value="Tsy misy"> Tsy misy</label>
+          <label class="choice-item"><input type="radio" name="fitahiry" value="Tsy misy" required> Tsy misy</label>
           <label class="choice-item"><input type="radio" name="fitahiry" value="Banky"> Banky</label>
           <label class="choice-item"><input type="radio" name="fitahiry" value="Mobile banking"> Mobile banking</label>
           <label class="choice-item"><input type="radio" name="fitahiry" value="Hafa"> Hafa</label>
@@ -2265,7 +2071,7 @@
       </div>
 
       <div class="field">
-        <label><span class="q-num">50</span>Findramam-bola tao anatin'ny 2 taona lasa</label>
+        <label class="req"><span class="q-num">50</span>Findramam-bola tao anatin'ny 2 taona lasa</label>
         <div class="choices vertical">
           <label class="choice-item"><input type="checkbox" name="fndram_tsy_misy"> a) Tsy misy</label>
           <label class="choice-item"><input type="checkbox" name="fndram_banky"> b) Banky</label>
@@ -2289,7 +2095,7 @@
     <div class="section-body">
 
       <div class="field">
-        <label><span class="q-num">51</span>Sokajin'ny tany</label>
+        <label class="req"><span class="q-num">51</span>Sokajin'ny tany</label>
         <div class="choices vertical">
           <label class="choice-item"><input type="checkbox" name="tany_tokotany"> a) Tokotany misy trano</label>
           <label class="choice-item"><input type="checkbox" name="tany_voajary"> b) Tanimboly voajary</label>
@@ -2312,17 +2118,17 @@
 
       <div class="inline-group">
         <div class="field">
-          <label><span class="q-num">53</span>Refin'ny tany manontolo</label>
-          <input type="text" name="refin_tany_total" placeholder="ex: 500 m²">
+          <label class="req"><span class="q-num">53</span>Refin'ny tany manontolo</label>
+          <input type="text" name="refin_tany_total" placeholder="ex: 500 m²" required>
         </div>
         <div class="field">
-          <label><span class="q-num">54</span>Refin'ny tany voakasika</label>
-          <input type="text" name="refin_tany_voak" placeholder="ex: 200 m²">
+          <label class="req"><span class="q-num">54</span>Refin'ny tany voakasika</label>
+          <input type="text" name="refin_tany_voak" placeholder="ex: 200 m²" required>
         </div>
       </div>
 
       <div class="field">
-        <label><span class="q-num">55</span>Taratasy mahakasika ny fananan-tany</label>
+        <label class="req"><span class="q-num">55</span>Taratasy mahakasika ny fananan-tany</label>
         <div class="choices">
           <label class="choice-item"><input type="checkbox" name="tar_titra"> Titra</label>
           <label class="choice-item"><input type="checkbox" name="tar_kadasitra"> Kadasitra</label>
@@ -2332,9 +2138,9 @@
       </div>
 
       <div class="field">
-        <label><span class="q-num">56</span>Mpampiasa ny tany</label>
+        <label class="req"><span class="q-num">56</span>Mpampiasa ny tany</label>
         <div class="choices vertical">
-          <label class="choice-item"><input type="radio" name="mpampiasa_tany" value="Tompony"> a) Tompony</label>
+          <label class="choice-item"><input type="radio" name="mpampiasa_tany" value="Tompony" required> a) Tompony</label>
           <label class="choice-item"><input type="radio" name="mpampiasa_tany" value="Mpanofa ara-dalàna"> b) Mpanofa ara-dalàna</label>
           <label class="choice-item"><input type="radio" name="mpampiasa_tany" value="Fahazoan-dalana hampiasa amin'ny fotoana voafetra"> c) Fahazoan-dalana hampiasa amin'ny fotoana voafetra</label>
           <label class="choice-item"><input type="radio" name="mpampiasa_tany" value="Mpampiasa ara-drazana"> d) Mpampiasa ara-drazana</label>
@@ -2370,12 +2176,12 @@
       </div>
 
       <div class="field">
-        <label><span class="q-num">60</span>Tombambidin'ny tany (m²)</label>
+        <label class="req"><span class="q-num">60</span>Tombambidin'ny tany (m²)</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="tombam_tany" value="Latsaky ny 10 000 Ar"> &lt;10 000 Ar</label>
-          <label class="choice-item"><input type="radio" name="tombam_tany" value="10 000 –50 000 Ar"> 10–50 000 Ar</label>
-          <label class="choice-item"><input type="radio" name="tombam_tany" value="50 000 –100 000 Ar"> 50–100 000 Ar</label>
-          <label class="choice-item"><input type="radio" name="tombam_tany" value="Mihoatra ny 100 000 Ar"> &gt;100 000 Ar</label>
+          <label class="choice-item"><input type="radio" name="tombam_tany" value="Inférieur à 10.000Ar" required> Latsaky ny 10.000Ar</label>
+          <label class="choice-item"><input type="radio" name="tombam_tany" value="10.000–50.000Ar"> 10.000–50.000Ar</label>
+          <label class="choice-item"><input type="radio" name="tombam_tany" value="50.000–100.000Ar"> 50.000–100.000Ar</label>
+          <label class="choice-item"><input type="radio" name="tombam_tany" value="> 100.000Ar"> Mihoatra ny 100.000Ar</label>
         </div>
       </div>
 
@@ -2404,9 +2210,9 @@
         <label><span class="q-num">62</span>Fotoana niorina ny trano</label>
         <div class="choices">
           <label class="choice-item"><input type="radio" name="trano_taona" value="Tao arian'ny 2024"> Tao arian'ny 2024</label>
-          <label class="choice-item"><input type="radio" name="trano_taona" value="2–5 taona"> 2–5 taona</label>
-          <label class="choice-item"><input type="radio" name="trano_taona" value="5–10 taona"> 5–10 taona</label>
-          <label class="choice-item"><input type="radio" name="trano_taona" value="Mihoatra ny 10 taona"> Mihoatra ny 10 taona</label>
+          <label class="choice-item"><input type="radio" name="trano_taona" value="2–5taona"> 2–5taona</label>
+          <label class="choice-item"><input type="radio" name="trano_taona" value="5–10taona"> 5–10taona</label>
+          <label class="choice-item"><input type="radio" name="trano_taona" value="> 10taona"> Mihoatra ny 10taona</label>
         </div>
       </div>
 
@@ -2417,7 +2223,7 @@
           <label class="choice-item"><input type="radio" name="trano_rihana" value="1"> Iray</label>
           <label class="choice-item"><input type="radio" name="trano_rihana" value="2"> Roa</label>
           <label class="choice-item"><input type="radio" name="trano_rihana" value="3"> Telo</label>
-          <label class="choice-item"><input type="radio" name="trano_rihana" value="Mihoatra ny telo"> Mihoatra ny telo</label>
+          <label class="choice-item"><input type="radio" name="trano_rihana" value="> 3"> Mihoatra ny telo</label>
         </div>
       </div>
 
@@ -2428,7 +2234,7 @@
           <label class="choice-item"><input type="radio" name="trano_efitrano" value="2"> 2</label>
           <label class="choice-item"><input type="radio" name="trano_efitrano" value="3"> 3</label>
           <label class="choice-item"><input type="radio" name="trano_efitrano" value="4"> 4</label>
-          <label class="choice-item"><input type="radio" name="trano_efitrano" value="Mihoatra ny 4"> +4</label>
+          <label class="choice-item"><input type="radio" name="trano_efitrano" value="> 4"> Mihoatra ny 4</label>
         </div>
       </div>
 
@@ -2471,46 +2277,46 @@
     <div class="section-body">
 
       <div class="field">
-        <label><span class="q-num">69</span>Tombanana firy isan-jato ny fanelingelenana eo amin'ny fiainan'ny ankohonana</label>
+        <label class="req"><span class="q-num">69</span>Tombanana firy isan-jato ny fanelingelenana eo amin'ny fiainan'ny ankohonana</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="faneling_fianakaviana" value="Latsaky ny 25%"> &lt;25%</label>
+          <label class="choice-item"><input type="radio" name="faneling_fianakaviana" value="0%" required> Tsy misy</label>
+          <label class="choice-item"><input type="radio" name="faneling_fianakaviana" value="Inférieur à 25%"> Latsaky ny 25%</label>
           <label class="choice-item"><input type="radio" name="faneling_fianakaviana" value="25–50%"> 25–50%</label>
           <label class="choice-item"><input type="radio" name="faneling_fianakaviana" value="50–75%"> 50–75%</label>
-          <label class="choice-item"><input type="radio" name="faneling_fianakaviana" value="Mihoatra ny 75%"> &gt;75%</label>
-          <label class="choice-item"><input type="radio" name="faneling_fianakaviana" value="Tsy misy"> Tsy misy</label>
+          <label class="choice-item"><input type="radio" name="faneling_fianakaviana" value="> 75%"> Mihoatra ny 75%</label>
         </div>
       </div>
 
       <div class="field">
-        <label><span class="q-num">70</span>Fahavitan-tena amin'ny fifindrana</label>
+        <label class="req"><span class="q-num">70</span>Fahavitan-tena amin'ny fifindrana</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="fifindrana_pct" value="0"> 0%</label>
-          <label class="choice-item"><input type="radio" name="fifindrana_pct" value="Latsaky ny 25%"> &lt;25%</label>
+          <label class="choice-item"><input type="radio" name="fifindrana_pct" value="0%" required> 0%</label>
+          <label class="choice-item"><input type="radio" name="fifindrana_pct" value="Inférieur à 25%"> Latsaky ny 25%</label>
           <label class="choice-item"><input type="radio" name="fifindrana_pct" value="25–50%"> 25–50%</label>
           <label class="choice-item"><input type="radio" name="fifindrana_pct" value="50–75%"> 50–75%</label>
-          <label class="choice-item"><input type="radio" name="fifindrana_pct" value="Mihoatra ny 75%"> &gt;75%</label>
+          <label class="choice-item"><input type="radio" name="fifindrana_pct" value="> 75%"> Mihoatra ny 75%</label>
         </div>
       </div>
 
       <div class="field">
-        <label><span class="q-num">71</span>Tombanana firy isan-jato ny fanelingelenana ateraky ny tetikasa amin'ny asa fivelomana</label>
+        <label class="req"><span class="q-num">71</span>Tombanana firy isan-jato ny fanelingelenana ateraky ny tetikasa amin'ny asa fivelomana</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="faneling_fivelomana" value="0"> 0%</label>
-          <label class="choice-item"><input type="radio" name="faneling_fivelomana" value="Latsaky ny 25%"> &lt;25%</label>
+          <label class="choice-item"><input type="radio" name="faneling_fivelomana" value="0%" required> 0%</label>
+          <label class="choice-item"><input type="radio" name="faneling_fivelomana" value="Inférieur à 25%"> Latsaky ny 25%</label>
           <label class="choice-item"><input type="radio" name="faneling_fivelomana" value="25–50%"> 25–50%</label>
           <label class="choice-item"><input type="radio" name="faneling_fivelomana" value="50–75%"> 50–75%</label>
-          <label class="choice-item"><input type="radio" name="faneling_fivelomana" value="Mihoatra ny 75%"> &gt;75%</label>
+          <label class="choice-item"><input type="radio" name="faneling_fivelomana" value="> 75%"> Mihoatra ny 75%</label>
         </div>
       </div>
 
       <div class="field">
-        <label><span class="q-num">72</span>Fahafahana miarina ara-pivelomana raha voaelingelina ny asa</label>
+        <label class="req"><span class="q-num">72</span>Fahafahana miarina ara-pivelomana raha voaelingelina ny asa</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="miarina_pct" value="0%"> 0%</label>
-          <label class="choice-item"><input type="radio" name="miarina_pct" value="Latsaky ny 25%"> &lt;25%</label>
+          <label class="choice-item"><input type="radio" name="miarina_pct" value="0%" required> 0%</label>
+          <label class="choice-item"><input type="radio" name="miarina_pct" value="Inférieur à 25%"> Latsaky ny 25%</label>
           <label class="choice-item"><input type="radio" name="miarina_pct" value="25–50%"> 25–50%</label>
           <label class="choice-item"><input type="radio" name="miarina_pct" value="50–75%"> 50–75%</label>
-          <label class="choice-item"><input type="radio" name="miarina_pct" value="Mihoatra ny 75%"> &gt;75%</label>
+          <label class="choice-item"><input type="radio" name="miarina_pct" value="> 75%"> Mihoatra ny 75%</label>
         </div>
       </div>
 
@@ -2526,18 +2332,18 @@
     <div class="section-body">
 
       <div class="field">
-        <label><span class="q-num">73</span>Tany</label>
+        <label class="req"><span class="q-num">73</span>Tany</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="fanak_tany" value="Manontolo"> Manontolo</label>
+          <label class="choice-item"><input type="radio" name="fanak_tany" value="Manontolo" required> Manontolo</label>
           <label class="choice-item"><input type="radio" name="fanak_tany" value="Ampahany"> Ampahany</label>
           <label class="choice-item"><input type="radio" name="fanak_tany" value="Tsy misy"> Tsy misy</label>
         </div>
       </div>
 
       <div class="field">
-        <label><span class="q-num">74</span>Trano</label>
+        <label class="req"><span class="q-num">74</span>Trano</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="fanak_trano" value="Manontolo"> Manontolo</label>
+          <label class="choice-item"><input type="radio" name="fanak_trano" value="Manontolo" required> Manontolo</label>
           <label class="choice-item"><input type="radio" name="fanak_trano" value="Ampahany"> Ampahany</label>
           <label class="choice-item"><input type="radio" name="fanak_trano" value="Tsy misy"> Tsy misy</label>
         </div>
@@ -2625,7 +2431,7 @@
           <input type="number" name="isan_sembanana" min="0" placeholder="Isa">
         </div>
         <div class="field">
-          <label><span class="q-num">81</span>Isan'ny vehivay bevohoka</label>
+          <label><span class="q-num">81</span>Isan'ny vehivavy bevohoka</label>
           <input type="number" name="isan_bevohoka" min="0" placeholder="Isa">
         </div>
       </div>
@@ -2639,12 +2445,14 @@
       </div>
 
       <div class="field">
-        <label><span class="q-num">82</span>Herisetra mihantra amin'ny vehivavy</label>
+        <label class="req"><span class="q-num">82</span>Herisetra mihantra amin'ny vehivavy</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="herisetra" value="Eny"> Eny</label>
-          <label class="choice-item"><input type="radio" name="herisetra" value="Tsia"> Tsia</label>
+          <label class="choice-item"><input type="radio" name="herisetra" value="Eny" required onchange="toggleHerisetra(this.value)"> Eny</label>
+          <label class="choice-item"><input type="radio" name="herisetra" value="Tsia" onchange="toggleHerisetra(this.value)"> Tsia</label>
         </div>
       </div>
+
+      <div id="herisetra-details" style="display:none">
 
       <div class="field">
         <label><span class="q-num">83</span>Karazan'ny herisetra</label>
@@ -2700,6 +2508,8 @@
         <textarea name="hevitra_87" placeholder="Hevitra..."></textarea>
       </div>
 
+      </div><!-- /#herisetra-details -->
+
     </div>
   </div>
 
@@ -2712,7 +2522,7 @@
     <div class="section-body">
 
       <div class="field">
-        <label><span class="q-num">88</span>Inona no tetikasa tan-tsoroka mety hanampy amin'ny fanatsarana ny fivelomana?</label>
+        <label class="req"><span class="q-num">88</span>Inona no tetikasa tan-tsoroka mety hanampy amin'ny fanatsarana ny fivelomana?</label>
         <div class="choices vertical">
           <label class="choice-item"><input type="checkbox" name="tans_tsy_misy"> a) Tsy misy fa efa mety</label>
           <label class="choice-item"><input type="checkbox" name="tans_fanofanana"> b) Fanofanana arak'asa</label>
@@ -2733,25 +2543,25 @@
     <div class="section-body">
 
       <div class="field">
-        <label><span class="q-num">89</span>Mahakasika ny fandravana</label>
+        <label class="req"><span class="q-num">89</span>Mahakasika ny fandravana</label>
         <div class="choices">
-          <label class="choice-item"><input type="radio" name="fandravana" value="Ataon'ny tompony"> a) Ataon'ny tompony</label>
+          <label class="choice-item"><input type="radio" name="fandravana" value="Ataon'ny tompony" required> a) Ataon'ny tompony</label>
           <label class="choice-item"><input type="radio" name="fandravana" value="Ataon'ny orinasa manao ny fefiloha"> b) Ataon'ny orinasa manao ny fefiloha</label>
         </div>
       </div>
 
       <div class="field">
-        <label><span class="q-num">90</span>Fanonerana safidiana</label>
+        <label class="req"><span class="q-num">90</span>Fanonerana safidiana</label>
         <div class="choices vertical">
-          <label class="choice-item"><input type="radio" name="fanonerana" value="Fanonerana ara-bola"> a) Fanonerana ara-bola</label>
+          <label class="choice-item"><input type="radio" name="fanonerana" value="Fanonerana ara-bola" required> a) Fanonerana ara-bola</label>
           <label class="choice-item"><input type="radio" name="fanonerana" value="Fanonerana ny zavatra simba amin'ny laoniny"> b) Fanonerana ny zavatra simba amin'ny laoniny</label>
           <label class="choice-item"><input type="radio" name="fanonerana" value="Famindrana amin'ny toerana voahomana amboarin'ny tetikasa"> c) Famindrana amin'ny toerana voahomana amboarin'ny tetikasa</label>
         </div>
       </div>
 
       <div class="field">
-        <label><span class="q-num">91</span>Anton'ny safidy teo ambony</label>
-        <textarea name="antony_safidy" placeholder="Fanazavana ny safidy..."></textarea>
+        <label class="req"><span class="q-num">91</span>Anton'ny safidy teo ambony</label>
+        <textarea name="antony_safidy" placeholder="Fanazavana ny safidy..." required></textarea>
       </div>
 
     </div>
@@ -2775,9 +2585,9 @@
       </div>
 
       <div class="field">
-        <label><span class="q-num">93</span>Fomba hifanarahana amin'ny tetikasa</label>
+        <label class="req"><span class="q-num">93</span>Fomba hifanarahana amin'ny tetikasa</label>
         <div class="choices vertical">
-          <label class="choice-item"><input type="radio" name="fomba_fifanar" value="An-taratasy voavakinao sy voasoni-nao"> a) An-taratasy voavakinao sy voasoni-nao</label>
+          <label class="choice-item"><input type="radio" name="fomba_fifanar" value="An-taratasy voavakinao sy voasoni-nao" required> a) An-taratasy voavakinao sy voasoni-nao</label>
           <label class="choice-item"><input type="radio" name="fomba_fifanar" value="An-taratasy voavakin'olona sy voasoni-nao"> b) An-taratasy voavakin'olona sy voasoni-nao</label>
           <label class="choice-item"><input type="radio" name="fomba_fifanar" value="An-taratasy voavakinao sy misy lavotondro"> c) An-taratasy voavakinao sy misy lavotondro</label>
           <label class="choice-item"><input type="radio" name="fomba_fifanar" value="An-taratasy voavakin'olona sy misy lavotondro"> d) An-taratasy voavakin'olona sy misy lavotondro</label>
@@ -2787,7 +2597,7 @@
 
       <div class="field">
         <label><span class="q-num">94</span>Fanamarihina, fanahiana, soso-kevitra mahakasika ny fitsinjovana ny olona voakasiky ny tetikasa</label>
-        <textarea name="fanamarihana_94" placeholder="Soratao eto ny fanamarihina sy soso-kevitra rehetra..." style="min-height:100px"></textarea>
+        <textarea name="fanamarihana_94" placeholder="Sorato eto ny fanamarihina sy soso-kevitra rehetra..." style="min-height:100px"></textarea>
       </div>
 
     </div>
@@ -2916,6 +2726,7 @@
     Fizarana <strong id="navCurrent">1</strong> / <strong id="navTotal">17</strong>
   </div>
   <div style="display:flex;gap:10px">
+    <button class="btn btn-brouillon" id="btnBrouillon" onclick="exportBrouillon()" title="Exporter un brouillon JSON" style="display:none">💾 Brouillon</button>
     <button class="btn btn-prev" id="btnPrev" onclick="navigate(-1)">← Teo aloha</button>
     <button class="btn btn-next" id="btnNext" onclick="navigate(1)">Manaraka →</button>
     <button class="btn btn-submit" id="btnSubmit" style="display:none" onclick="submitForm()">Alefa ✓</button>
@@ -3216,8 +3027,8 @@
     
     docDiv.innerHTML = `
       <div class="document-type-select">
-        <label style="font-weight:600;font-size:13px;margin-bottom:8px;display:block;">Type de document</label>
-        <select name="doc_${documentIdCounter}_type" style="width:100%;" onchange="updateDocumentType(${documentIdCounter}, this.value)">
+        <label style="font-weight:600;font-size:13px;margin-bottom:8px;display:block;">Type de document <span style="color:#e53e3e;font-weight:700"> *</span></label>
+        <select name="doc_${documentIdCounter}_type" style="width:100%;" required onchange="updateDocumentType(${documentIdCounter}, this.value)">
           <option value="">-- Safidio ny karazana taratasy --</option>
           <option value="cni">📜 Carte Nationale d'Identité</option>
           <option value="karatany">📜 Karatany</option>
@@ -3302,50 +3113,227 @@
     }
   }
 
+  // ── CROP QUEUE ────────────────────────────────────────────────────────────
+  const _cropQueue = [];
+  let _cropQueueActive = false;
+
+  const _cropState = {
+    docId: null, dataURL: null, fileName: null, fileType: null,
+    originalImage: null, canvas: null, ctx: null, scale: 1,
+    isDragging: false, dragStart: null, selection: null
+  };
+
   function processImages(docId, files) {
+    Array.from(files).forEach(file => _cropQueue.push({ docId, file }));
+    if (!_cropQueueActive) _processNextCrop();
+  }
+
+  function _processNextCrop() {
+    if (_cropQueue.length === 0) { _cropQueueActive = false; return; }
+    _cropQueueActive = true;
+    const { docId, file } = _cropQueue.shift();
+    const reader = new FileReader();
+    reader.onload = function(e) { _openCropModal(docId, file, e.target.result); };
+    reader.readAsDataURL(file);
+  }
+
+  function _openCropModal(docId, file, dataURL) {
+    Object.assign(_cropState, {
+      docId, dataURL,
+      fileName: file.name, fileType: file.type,
+      selection: null, isDragging: false
+    });
+    const modal = document.getElementById('cropModal');
+    const canvas = document.getElementById('cropCanvas');
+    const remaining = _cropQueue.length;
+    document.getElementById('cropQueueBadge').textContent =
+      remaining > 0 ? `Image 1 sur ${remaining + 1}` : '';
+    modal.style.display = 'block';
+
+    // Wait for the modal to be laid out before measuring dimensions (critical on tablets)
+    requestAnimationFrame(function() {
+      const img = new Image();
+      img.onload = function() {
+        _cropState.originalImage = img;
+        const wrapper = canvas.parentElement;
+        const maxW = Math.min(wrapper.clientWidth || window.innerWidth - 32, 820);
+        const maxH = Math.min(window.innerHeight * 0.52, 480);
+        const scale = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight, 1);
+        canvas.width  = Math.round(img.naturalWidth  * scale);
+        canvas.height = Math.round(img.naturalHeight * scale);
+        canvas.style.width  = canvas.width  + 'px';
+        canvas.style.height = canvas.height + 'px';
+        _cropState.scale = scale;
+        _cropState.canvas = canvas;
+        _cropState.ctx = canvas.getContext('2d');
+        _drawCropCanvas();
+      };
+      img.src = dataURL;
+    });
+  }
+
+  function _drawCropCanvas() {
+    const { ctx, canvas, originalImage, selection, scale } = _cropState;
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
+    if (selection && selection.w > 2 && selection.h > 2) {
+      // Darken outside
+      ctx.fillStyle = 'rgba(0,0,0,0.52)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Restore selection area
+      ctx.drawImage(
+        originalImage,
+        selection.x / scale, selection.y / scale,
+        selection.w / scale, selection.h / scale,
+        selection.x, selection.y, selection.w, selection.h
+      );
+      // Border
+      ctx.strokeStyle = '#e8b870';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 3]);
+      ctx.strokeRect(selection.x + 1, selection.y + 1, selection.w - 2, selection.h - 2);
+      ctx.setLineDash([]);
+      // Corner handles
+      const hs = 8;
+      ctx.fillStyle = '#c5883a';
+      [
+        [selection.x, selection.y],
+        [selection.x + selection.w, selection.y],
+        [selection.x, selection.y + selection.h],
+        [selection.x + selection.w, selection.y + selection.h]
+      ].forEach(([cx, cy]) => ctx.fillRect(cx - hs/2, cy - hs/2, hs, hs));
+      // Dimensions label
+      const origW = Math.round(selection.w / scale);
+      const origH = Math.round(selection.h / scale);
+      ctx.font = '12px sans-serif';
+      ctx.fillStyle = '#fff';
+      ctx.fillText(`${origW}×${origH}px`, selection.x + 4, selection.y + 16);
+    }
+  }
+
+  let _drawPending = false;
+  function _scheduleDraw() {
+    if (_drawPending) return;
+    _drawPending = true;
+    requestAnimationFrame(function() { _drawCropCanvas(); _drawPending = false; });
+  }
+
+  function _getCropPos(e) {
+    const canvas = _cropState.canvas;
+    const rect = canvas.getBoundingClientRect();
+    // Use changedTouches for touchend, touches for touchstart/touchmove
+    const src = (e.touches && e.touches.length > 0) ? e.touches[0]
+              : (e.changedTouches && e.changedTouches.length > 0) ? e.changedTouches[0]
+              : e;
+    const scaleX = canvas.width  / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+      x: Math.max(0, Math.min(canvas.width,  (src.clientX - rect.left) * scaleX)),
+      y: Math.max(0, Math.min(canvas.height, (src.clientY - rect.top)  * scaleY))
+    };
+  }
+
+  function _initCropCanvasEvents() {
+    const canvas = document.getElementById('cropCanvas');
+    if (!canvas) return;
+    canvas.addEventListener('mousedown',  _onCropStart,  { passive: false });
+    canvas.addEventListener('mousemove',  _onCropMove,   { passive: false });
+    canvas.addEventListener('mouseup',    _onCropEnd,    { passive: false });
+    canvas.addEventListener('mouseleave', _onCropEnd,    { passive: true  });
+    canvas.addEventListener('touchstart', _onCropStart,  { passive: false });
+    canvas.addEventListener('touchmove',  _onCropMove,   { passive: false });
+    canvas.addEventListener('touchend',   _onCropEnd,    { passive: false });
+    canvas.addEventListener('touchcancel',_onCropEnd,    { passive: true  });
+    // Also prevent page scroll when touching the wrapper
+    const wrapper = canvas.parentElement;
+    if (wrapper) wrapper.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
+  }
+
+  function _onCropStart(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    _cropState.isDragging = true;
+    _cropState.dragStart = _getCropPos(e);
+    _cropState.selection = null;
+    _scheduleDraw();
+  }
+  function _onCropMove(e) {
+    if (!_cropState.isDragging) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const pos = _getCropPos(e);
+    _cropState.selection = {
+      x: Math.min(_cropState.dragStart.x, pos.x),
+      y: Math.min(_cropState.dragStart.y, pos.y),
+      w: Math.abs(pos.x - _cropState.dragStart.x),
+      h: Math.abs(pos.y - _cropState.dragStart.y)
+    };
+    _scheduleDraw();
+  }
+  function _onCropEnd(e) {
+    if (!_cropState.isDragging) return;
+    _cropState.isDragging = false;
+    if (_cropState.selection && (_cropState.selection.w < 10 || _cropState.selection.h < 10)) {
+      _cropState.selection = null;
+      _scheduleDraw();
+    }
+  }
+
+  function applyCrop() {
+    const { selection, originalImage, scale, docId, dataURL, fileName, fileType } = _cropState;
+    if (!selection || selection.w < 10 || selection.h < 10) { skipCrop(); return; }
+    const sx = Math.round(selection.x / scale), sy = Math.round(selection.y / scale);
+    const sw = Math.round(selection.w / scale), sh = Math.round(selection.h / scale);
+    const out = document.createElement('canvas');
+    out.width = sw; out.height = sh;
+    out.getContext('2d').drawImage(originalImage, sx, sy, sw, sh, 0, 0, sw, sh);
+    const croppedURL = out.toDataURL(fileType || 'image/jpeg', 0.92);
+    _closeCropModal();
+    _addImageToDocument(docId, croppedURL, fileName, fileType);
+  }
+
+  function skipCrop() {
+    const { docId, dataURL, fileName, fileType } = _cropState;
+    _closeCropModal();
+    _addImageToDocument(docId, dataURL, fileName, fileType);
+  }
+
+  function cancelCrop() {
+    // Discard remaining queue items for this docId before closing
+    const docId = _cropState.docId;
+    while (_cropQueue.length && _cropQueue[0].docId === docId) _cropQueue.shift();
+    _closeCropModal();
+  }
+
+  function _closeCropModal() {
+    document.getElementById('cropModal').style.display = 'none';
+    _cropState.originalImage = null;
+    _processNextCrop();
+  }
+
+  function _addImageToDocument(docId, dataURL, fileName, fileType) {
     const previewDiv = document.getElementById(`preview_${docId}`);
     if (!previewDiv) return;
-    
-    Array.from(files).forEach((file, index) => {
-      const reader = new FileReader();
-      
-      reader.onload = function(e) {
-        const imgId = `${docId}_${Date.now()}_${index}`;
-        
-        // Store in documentsData
-        const docType = document.querySelector(`select[name="doc_${docId}_type"]`)?.value || '';
-        const docAutreDesc = document.querySelector(`input[name="doc_${docId}_autre_desc"]`)?.value || '';
-        
-        documentsData.push({
-          docId: docId,
-          imgId: imgId,
-          type: docType,
-          autreDesc: docAutreDesc,
-          data: e.target.result,
-          fileName: file.name,
-          fileSize: file.size,
-          fileType: file.type
-        });
-        
-        // Create preview
-        const previewItem = document.createElement('div');
-        previewItem.className = 'document-preview-item';
-        previewItem.setAttribute('data-img-id', imgId);
-        
-        previewItem.innerHTML = `
-          <img src="${e.target.result}" alt="Document">
-          <button class="remove-doc" onclick="removeDocumentImage('${imgId}')" type="button">✕</button>
-        `;
-        
-        previewDiv.appendChild(previewItem);
-        console.log(`✅ Image ${imgId} ajoutée au document ${docId}`);
-      };
-      
-      reader.readAsDataURL(file);
+    const imgId = `${docId}_${Date.now()}`;
+    const docType    = document.querySelector(`select[name="doc_${docId}_type"]`)?.value || '';
+    const docAutreDesc = document.querySelector(`input[name="doc_${docId}_autre_desc"]`)?.value || '';
+    documentsData.push({
+      docId, imgId, type: docType, autreDesc: docAutreDesc,
+      data: dataURL,
+      fileName: fileName || 'image.jpg',
+      fileSize: Math.round(dataURL.length * 0.75),
+      fileType: fileType || 'image/jpeg'
     });
-    
-    // Clear input
-    input.value = '';
+    const previewItem = document.createElement('div');
+    previewItem.className = 'document-preview-item';
+    previewItem.setAttribute('data-img-id', imgId);
+    previewItem.innerHTML = `
+      <img src="${dataURL}" alt="Document">
+      <button class="remove-doc" onclick="removeDocumentImage('${imgId}')" type="button">✕</button>
+    `;
+    previewDiv.appendChild(previewItem);
+    console.log(`✅ Image ${imgId} ajoutée au document ${docId}`);
   }
 
   function removeDocumentImage(imgId) {
@@ -3371,6 +3359,7 @@
   const btnPrev     = document.getElementById('btnPrev');
   const btnNext     = document.getElementById('btnNext');
   const btnSubmit   = document.getElementById('btnSubmit');
+  const btnBrouillon = document.getElementById('btnBrouillon');
   const navCurrent  = document.getElementById('navCurrent');
   const navTotal    = document.getElementById('navTotal');
   const sectionLabel= document.getElementById('sectionLabel');
@@ -3401,6 +3390,7 @@
     btnPrev.style.display = current === 0 ? 'none' : '';
     btnNext.style.display = current < TOTAL_SECTIONS - 1 ? '' : 'none';
     btnSubmit.style.display = current === TOTAL_SECTIONS - 1 ? '' : 'none';
+    btnBrouillon.style.display = current >= 2 ? '' : 'none';
 
     // Update lieu_signature when reaching section 18 (Signatures)
     if (current === 18) {
@@ -3855,6 +3845,7 @@
   };
 
   function submitForm() {
+    if (!validateRequiredFields()) return;
     // Check if signatures are present
     const hasEnqueteurSig = signatures.sigEnqueteur.data !== null;
     const hasEnqueteSig = signatures.sigEnquete.data !== null;
@@ -4020,17 +4011,16 @@
         sec0_identification: pickKeys(['daty','distrika','kaomina','fokontany','kaody_renirano','laharana_fisy']),
         sec1_pap: (() => {
           const pap = pickKeys(['anarana','fanampiny','taona','fananahana','fanambadiana','laharana_kp','daty_kp','toerana_kp','daty_duplicata','toerana_duplicata','finday']);
-          // Vady (Q9–13b) — toujours présent (vide si non marié)
-          pap.vady = pickKeys(['anarana_vady','taona_vady','kp_vady','daty_kp_vady','toerana_kp_vady','daty_duplicata_vady','toerana_duplicata_vady']);
-          // Toerana voakasika (Q15–17)
-          pap.toerana_voakasika = pickKeys(['gps_x','gps_y','gps_precision']);
+          // Q9–13b : vady (fields plats, conforme au modèle)
+          Object.assign(pap, pickKeys(['anarana_vady','taona_vady','kp_vady','daty_kp_vady','toerana_kp_vady','daty_duplicata_vady','toerana_duplicata_vady']));
+          // Q15–17 : GPS (fields plats, conforme au modèle)
+          Object.assign(pap, pickKeys(['gps_x','gps_y','gps_precision']));
           return pap;
         })(),
         sec2_fahafantarana: (() => {
-          const sec2 = pickKeys(['fantatra_tetikasa']);
-          // Q18–23 — toujours présent (vide si non concerné)
-          sec2.details_tetikasa = pickKeys(['inona_tetikasa','ho_an_iza','aiza','ahoana','fantatra_vokatra']);
-          sec2.details_tetikasa.vokatra_inona = formData.vokatra_inona || '';
+          // Q18–23 — plat, conforme au modèle
+          const sec2 = pickKeys(['fantatra_tetikasa','inona_tetikasa','ho_an_iza','aiza','ahoana','fantatra_vokatra']);
+          sec2.vokatra_inona = formData.vokatra_inona || '';
           return sec2;
         })(),
         sec3_tokatrano: {
@@ -4038,29 +4028,21 @@
           membres_menage: formData.household_members || []
         },
         sec4_fanabeazana: (() => {
-          const sec4 = pickKeys(['isan_ankizy_sekoly_taona']);
-          // Q28 : nombre par niveau scolaire
-          sec4.miditra_sekoly = {
-            fototra:  { coché: formData.miditra_fototra  || false, isa: formData.miditra_fototra_nb  || '' },
-            faharoa:  { coché: formData.miditra_faharoa  || false, isa: formData.miditra_faharoa_nb  || '' },
-            ambony:   { coché: formData.miditra_ambony   || false, isa: formData.miditra_ambony_nb   || '' }
-          };
-          // Q29a/29b
-          Object.assign(sec4, pickKeys(['ray_fari','reny_fari']));
-          // Q30 : montant par niveau
-          sec4.vola_fanabeazana = {
-            fototra:  { coché: formData.vola_fototra  || false, montant_ar: formData.vola_fototra_mt  || '' },
-            faharoa:  { coché: formData.vola_faharoa  || false, montant_ar: formData.vola_faharoa_mt  || '' },
-            ambony:   { coché: formData.vola_ambony   || false, montant_ar: formData.vola_ambony_mt   || '' }
-          };
-          // Q31
-          Object.assign(sec4, pickKeys(['famp_fototra','famp_faharoa','famp_ambony']));
-          // Q32 : distance par niveau
-          sec4.elanelan_sekoly = {
-            fototra:  { coché: formData.elan_fototra  || false, distance_km: formData.elan_fototra_km  || '' },
-            faharoa:  { coché: formData.elan_faharoa  || false, distance_km: formData.elan_faharoa_km  || '' },
-            ambony:   { coché: formData.elan_ambony   || false, distance_km: formData.elan_ambony_km   || '' }
-          };
+          // Structure plate conforme au modèle
+          const sec4 = pickKeys([
+            'isan_ankizy_sekoly_taona',
+            'miditra_fototra','miditra_fototra_nb',
+            'miditra_faharoa','miditra_faharoa_nb',
+            'miditra_ambony','miditra_ambony_nb',
+            'ray_fari','reny_fari',
+            'vola_fototra','vola_fototra_mt',
+            'vola_faharoa','vola_faharoa_mt',
+            'vola_ambony','vola_ambony_mt',
+            'famp_fototra','famp_faharoa','famp_ambony',
+            'elan_fototra','elan_fototra_km',
+            'elan_faharoa','elan_faharoa_km',
+            'elan_ambony','elan_ambony_km'
+          ]);
           return sec4;
         })(),
         sec5_fahasalamana: pickKeys(['aretina1','aretina1_fahavaratra','aretina1_ririnina','aretina1_mandava','aretina1_note','aretina2','aretina2_fahavaratra','aretina2_ririnina','aretina2_mandava','aretina2_note','aretina3','aretina3_fahavaratra','aretina3_ririnina','aretina3_mandava','aretina3_note','tsab_tsy_misy','tsab_nentim','tsab_mpanent','tsab_csb','tsab_hopitaly','tsab_tsy_miank','fitsab_pct','elan_fitsab']),
@@ -4084,7 +4066,7 @@
         sec15_fanonerana: pickKeys(['fandravana','fanonerana','antony_safidy']),
         sec16_fitarainana: pickKeys(['fitarain_boaty','fitarain_boky','fitarain_olona','fomba_fifanar','fanamarihana_94']),
         sec17_documents: {
-          documents: formData.attached_documents || []
+          attached_documents: formData.attached_documents || []
         },
         sec18_sonia: {
           date_signature: formData.date_signature || '',
@@ -4327,21 +4309,253 @@
     }, 5000);
   }
 
+  // ══ VALIDATION DES CHAMPS OBLIGATOIRES ══
+  function validateRequiredFields() {
+    // Resolve conditional states
+    const fanambadiana = document.querySelector('input[name="fanambadiana"]:checked');
+    const isManambady  = fanambadiana && fanambadiana.value === 'Manambady';
+    const tahiry    = document.querySelector('input[name="tahiry"]:checked');
+    const tahiryVal = tahiry ? tahiry.value : null;
+
+    // Standard fields (text / number / select / radio)
+    const REQUIRED = [
+      // SEC0 – Fampidirana
+      { name: 'daty',              label: 'Daty',                                   section: 0 },
+      { name: 'distrika',          label: 'Distrika',                               section: 0 },
+      { name: 'kaomina',           label: 'Kaomina',                                section: 0 },
+      { name: 'fokontany',         label: 'Fokontany',                              section: 0 },
+      { name: 'kaody_renirano',    label: "Kaody Renirano",                         section: 0 },
+      { name: 'laharana_fisy',     label: "Laharan'ny fisy",                        section: 0 },
+      // SEC1 – PAP
+      { name: 'anarana',           label: 'Q1 – Anarana',                           section: 1 },
+      { name: 'taona',             label: 'Q3 – Taona',                             section: 1 },
+      { name: 'fananahana',        label: 'Q4 – Fananahana',                        section: 1, type: 'radio' },
+      { name: 'fanambadiana',      label: 'Q5 – Fanambadiana',                      section: 1, type: 'radio' },
+      { name: 'laharana_kp',       label: 'Q6 – Laharana kara-panondro',            section: 1 },
+      { name: 'gps_x',             label: 'Q15 – GPS X (Longitude)',                section: 1 },
+      { name: 'gps_y',             label: 'Q16 – GPS Y (Latitude)',                 section: 1 },
+      // SEC1 – conditionnels Manambady
+      ...(isManambady ? [
+        { name: 'anarana_vady', label: 'Q9 – Anarana sy fanampiny ny vady',         section: 1 },
+        { name: 'taona_vady',   label: 'Q10 – Taona (vady)',                        section: 1 },
+        { name: 'kp_vady',      label: 'Q11 – Laharana kara-panondro (vady)',       section: 1 },
+      ] : []),
+      // SEC2 – Fahafantarana
+      { name: 'fantatra_tetikasa', label: 'Q17 – Fantatra ve ny tetikasa?',         section: 2, type: 'radio' },
+      // SEC3 – Tokatrano
+      { name: 'kilasy',            label: "Q25 – Kilasy nijanonan'ny PAP",          section: 3, type: 'radio' },
+      { name: 'mamaky',            label: 'Q26 – Mahay mamaky teny sy manoratra?',  section: 3, type: 'radio' },
+      // SEC7 – Vola
+      { name: 'vola_miditra',      label: 'Q44 – Vola miditra isambolana',          section: 7, type: 'radio' },
+      { name: 'fitahiry',          label: 'Q49 – Fomba fitahirizana vola',          section: 7, type: 'radio' },
+      { name: 'tahiry',            label: 'Q46 – Fahafahana manao tahiry',          section: 7, type: 'radio' },
+      ...(tahiryVal === 'Eny'  ? [{ name: 'tahiry_pct',       label: 'Q47 – Fahafahana manao tahiry (%)', section: 7, type: 'radio' }] : []),
+      ...(tahiryVal === 'Tsia' ? [{ name: 'tsy_tahiry_antony', label: 'Q48 – Inona ny antony?',           section: 7 }] : []),
+      // SEC8 – Tany
+      { name: 'refin_tany_total',  label: "Q53 – Refin'ny tany manontolo",          section: 8 },
+      { name: 'refin_tany_voak',   label: "Q54 – Refin'ny tany voakasika",          section: 8 },
+      { name: 'mpampiasa_tany',    label: 'Q56 – Mpampiasa ny tany',               section: 8, type: 'radio' },
+      { name: 'tombam_tany',       label: 'Q60 – Tombambidin\'ny tany',             section: 8, type: 'radio' },
+      // SEC10 – Fanelingelenana
+      { name: 'faneling_fianakaviana', label: 'Q69 – Fanelingelenana amin\'ny fiainan\'ny ankohonana', section: 10, type: 'radio' },
+      { name: 'fifindrana_pct',    label: 'Q70 – Fahavitan-tena amin\'ny fifindrana', section: 10, type: 'radio' },
+      { name: 'faneling_fivelomana', label: 'Q71 – Fanelingelenana amin\'ny asa fivelomana', section: 10, type: 'radio' },
+      { name: 'miarina_pct',       label: 'Q72 – Fahafahana miarina ara-pivelomana', section: 10, type: 'radio' },
+      // SEC11 – Fananana voakitika
+      { name: 'fanak_tany',        label: 'Q73 – Tany (fananana voakitika)',        section: 11, type: 'radio' },
+      { name: 'fanak_trano',       label: 'Q74 – Trano (fananana voakitika)',       section: 11, type: 'radio' },
+      // SEC13 – Faharefoana
+      { name: 'herisetra',          label: 'Q82 – Herisetra mihantra amin\'ny vehivavy', section: 13, type: 'radio' },
+      // SEC15 – Fanonerana
+      { name: 'fandravana',        label: 'Q89 – Mahakasika ny fandravana',        section: 15, type: 'radio' },
+      { name: 'fanonerana',        label: 'Q90 – Fanonerana safidiana',            section: 15, type: 'radio' },
+      { name: 'antony_safidy',     label: 'Q91 – Anton\'ny safidy',                section: 15 },
+      // SEC16 – Fitarainana
+      { name: 'fomba_fifanar',     label: 'Q93 – Fomba hifanarahana',              section: 16, type: 'radio' },
+    ];
+
+    // Checkbox groups: at least one must be checked
+    const CHECKBOX_GROUPS = [
+      { names: ['vola_f_tsy_misy','vola_f_mamboly','vola_f_mivarotra','vola_f_mpanjono','vola_f_miasa_ori','vola_f_asa_tanana','vola_f_biriky','vola_f_fasika','vola_f_antselika','vola_f_hafa'],
+        label: 'Q42 – Loharanom-bola fototra', section: 7 },
+      { names: ['vola_a_tsy_misy','vola_a_mamboly','vola_a_mivarotra','vola_a_mpanjono','vola_a_miasa_ori','vola_a_asa_tanana','vola_a_biriky','vola_a_fasika','vola_a_antselika','vola_a_hafa'],
+        label: 'Q43 – Loharanom-bola fanampiny', section: 7 },
+      { names: ['fand_sakafo','fand_fahasalamana','fand_fanabeazana','fand_trano','fand_fitafiana','fand_hafa'],
+        label: 'Q45 – Fandaniana eo anivon\'ny tokatrano', section: 7 },
+      { names: ['fndram_tsy_misy','fndram_banky','fndram_mpamp','fndram_microf','fndram_varymaitso','fndram_mobile','fndram_hafa'],
+        label: 'Q50 – Findramam-bola', section: 7 },
+      { names: ['tany_tokotany','tany_voajary','tany_sasatra','tany_tanimbary'],
+        label: "Q51 – Sokajin'ny tany", section: 8 },
+      { names: ['tar_titra','tar_kadasitra','tar_karatany','tar_tsy_misy'],
+        label: 'Q55 – Taratasy mahakasika ny fananan-tany', section: 8 },
+      { names: ['tans_tsy_misy','tans_fanofanana','tans_lalambarotra','tans_hafa'],
+        label: 'Q88 – Tetikasa tan-tsoroka', section: 14 },
+    ];
+
+    const missing = [];
+
+    // Q24 – at least one member must have age AND gender filled
+    const memberAges = document.querySelectorAll('input[name^="member_"][name$="_age"]');
+    const hasValidMember = Array.from(memberAges).some(el => {
+      if (!el.value || el.value.trim() === '') return false;
+      const memberId = el.name.match(/member_(\d+)_age/)[1];
+      return !!document.querySelector(`input[name="member_${memberId}_gender"]:checked`);
+    });
+    if (!hasValidMember) {
+      const firstAgeEl = memberAges[0] || null;
+      missing.push({ label: "Q24 – Fitsinjarana ankohonana (taona + fananahana takiana)", section: 3, firstEl: firstAgeEl });
+    }
+
+    for (const field of REQUIRED) {
+      if (field.type === 'radio') {
+        if (!document.querySelector(`input[name="${field.name}"]:checked`)) missing.push({ ...field, firstEl: document.querySelector(`input[name="${field.name}"]`) });
+      } else {
+        const el = document.querySelector(`[name="${field.name}"]`);
+        if (!el || !el.value || el.value.trim() === '') missing.push({ ...field, firstEl: el });
+      }
+    }
+
+    for (const grp of CHECKBOX_GROUPS) {
+      const anyChecked = grp.names.some(n => { const el = document.querySelector(`[name="${n}"]`); return el && el.checked; });
+      if (!anyChecked) missing.push({ ...grp, firstEl: document.querySelector(`[name="${grp.names[0]}"]`) });
+    }
+
+    // Document type: each added document must have a type selected
+    document.querySelectorAll('select[name^="doc_"][name$="_type"]').forEach(sel => {
+      if (!sel.value) missing.push({ label: 'Document annexé – Type de document non sélectionné', section: 17, firstEl: sel });
+    });
+
+    if (missing.length === 0) return true;
+
+    // Highlight missing fields
+    missing.forEach(({ firstEl }) => {
+      if (!firstEl) return;
+      firstEl.style.borderColor = '#e53e3e';
+      firstEl.style.boxShadow   = '0 0 0 3px rgba(229,62,62,0.2)';
+      setTimeout(() => { firstEl.style.borderColor = ''; firstEl.style.boxShadow = ''; }, 4000);
+    });
+
+    const fieldList = missing.map(f => `\u2022 ${f.label}`).join('\n');
+    alert(`⚠️ Tsy vita ny feno ny sahan'asa takiana:\n\n${fieldList}\n\nAzafady fenoy ireo saha mena ireo aloha vao azo alefa ny angona.`);
+
+    // Navigate to the section of the first missing field
+    current = missing[0].section;
+    render();
+    return false;
+  }
+
   function downloadJSON() {
-    // Try to get last submission data
+    if (!validateRequiredFields()) return;
     const jsonData = sessionStorage.getItem('last_json_data') || localStorage.getItem('produir2_last_submission');
-    
     if (!jsonData) {
       showToast('⚠️ Aucune donnée à télécharger', 'error');
       return;
     }
-    
     try {
       const formData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
       saveFormAsJSON(formData);
     } catch (error) {
       console.error('❌ Erreur:', error);
       showToast('⚠️ Erreur lors du téléchargement', 'error');
+    }
+  }
+
+  // Handle retenu pour écraser le même fichier brouillon (File System Access API)
+  let _brouillonFileHandle = null;
+  let _brouillonFilename   = null;
+
+  async function exportBrouillon() {
+    // Validation des champs obligatoires fizarana 1 et 2 (sauf Q6 laharana_kp)
+    const fanambadiana = document.querySelector('input[name="fanambadiana"]:checked');
+    const isManambady  = fanambadiana && fanambadiana.value === 'Manambady';
+    const BROUILLON_REQUIRED = [
+      // SEC0 (identification minimale pour le nom de fichier)
+      { name: 'laharana_fisy',      label: "Laharan'ny fisy",                       type: 'text'  },
+      { name: 'fokontany',          label: 'Fokontany',                              type: 'text'  },
+      { name: 'kaomina',            label: 'Kaomina',                                type: 'text'  },
+      // SEC1 – sauf Q6
+      { name: 'anarana',            label: 'Q1 – Anarana',                           type: 'text'  },
+      { name: 'taona',              label: 'Q3 – Taona',                             type: 'text'  },
+      { name: 'fananahana',         label: 'Q4 – Fananahana',                        type: 'radio' },
+      { name: 'fanambadiana',       label: 'Q5 – Fanambadiana',                      type: 'radio' },
+      { name: 'gps_x',              label: 'Q15 – GPS X (Longitude)',                type: 'text'  },
+      { name: 'gps_y',              label: 'Q16 – GPS Y (Latitude)',                 type: 'text'  },
+      ...(isManambady ? [
+        { name: 'anarana_vady',     label: 'Q9 – Anarana sy fanampiny ny vady',      type: 'text'  },
+        { name: 'taona_vady',       label: 'Q10 – Taona (vady)',                     type: 'text'  },
+        { name: 'kp_vady',          label: 'Q11 – Laharana kara-panondro (vady)',    type: 'text'  },
+      ] : []),
+      // SEC2
+      { name: 'fantatra_tetikasa',  label: 'Q17 – Fantatra ve ny tetikasa?',         type: 'radio' },
+    ];
+
+    const missing = [];
+    for (const f of BROUILLON_REQUIRED) {
+      if (f.type === 'radio') {
+        if (!document.querySelector(`input[name="${f.name}"]:checked`))
+          missing.push(f.label);
+      } else {
+        const el = document.querySelector(`[name="${f.name}"]`);
+        if (!el || !el.value || el.value.trim() === '') missing.push(f.label);
+      }
+    }
+    if (missing.length > 0) {
+      alert('⚠️ Fenoy aloha ireto saha takiana ireto aloha ny hamoahana ny brouillon:\n\n' + missing.map(l => '• ' + l).join('\n'));
+      return;
+    }
+
+    const clean = s => (s || '').replace(/[^a-zA-Z0-9\u00C0-\u024F]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+    const anarana       = clean(document.querySelector('[name="anarana"]')?.value)       || 'X';
+    const fanampiny     = clean(document.querySelector('[name="fanampiny"]')?.value)     || 'X';
+    const laharana_fisy = clean(document.querySelector('[name="laharana_fisy"]')?.value) || 'X';
+    const fokontany     = clean(document.querySelector('[name="fokontany"]')?.value)     || 'X';
+    const kaomina       = clean(document.querySelector('[name="kaomina"]')?.value)       || 'X';
+    const filename = `Brouillon_${anarana}_${fanampiny}_${laharana_fisy}_${fokontany}_${kaomina}.json`;
+    const formData = collectFormData();
+    formData._brouillon = true;
+    formData._brouillon_date = new Date().toISOString();
+    const jsonString = JSON.stringify(formData, null, 2);
+
+    // Si le nom de fichier a changé (PAP différent), on réinitialise le handle
+    if (_brouillonFilename && _brouillonFilename !== filename) {
+      _brouillonFileHandle = null;
+    }
+    _brouillonFilename = filename;
+
+    try {
+      if (window.showSaveFilePicker && _brouillonFileHandle) {
+        // Même session, même fichier → écraser silencieusement
+        const writable = await _brouillonFileHandle.createWritable();
+        await writable.write(jsonString);
+        await writable.close();
+        showToast(`💾 Brouillon mis à jour : ${filename}`, 'success');
+      } else if (window.showSaveFilePicker) {
+        // Première fois → laisser l'utilisateur choisir l'emplacement
+        try {
+          _brouillonFileHandle = await window.showSaveFilePicker({
+            suggestedName: filename,
+            types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
+          });
+          const writable = await _brouillonFileHandle.createWritable();
+          await writable.write(jsonString);
+          await writable.close();
+          showToast(`💾 Brouillon enregistré : ${_brouillonFileHandle.name}`, 'success');
+        } catch (e) {
+          if (e.name === 'AbortError') return; // utilisateur a annulé
+          throw e;
+        }
+      } else {
+        // Fallback : téléchargement classique (Firefox, Safari…)
+        const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click();
+        setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 2000);
+        showToast(`💾 Brouillon téléchargé : ${filename}`, 'success');
+      }
+    } catch (e) {
+      alert('❌ Erreur lors de l\'export du brouillon : ' + e.message);
     }
   }
 
@@ -5394,11 +5608,6 @@
       datyField.value = `${day}/${month}/${year}`;
     }
     
-    // Reset GPS coordinates acquisition flag
-    if (typeof gpsCoordinatesAcquired !== 'undefined') {
-      gpsCoordinatesAcquired = false;
-    }
-    
     // Navigate to first section
     current = 0;
     render();
@@ -5499,6 +5708,14 @@
         else el.value = '';
       });
     }
+    // Conditionnellement obligatoires : Q9 (anarana_vady), Q10 (taona_vady), Q11 (kp_vady)
+    ['anarana_vady', 'taona_vady', 'kp_vady'].forEach(n => {
+      const el = document.querySelector('[name="' + n + '"]');
+      if (!el) return;
+      const label = el.closest('.field')?.querySelector(':scope > label');
+      if (label) label.classList.toggle('req', isManambady);
+      el.required = isManambady;
+    });
   }
 
   document.querySelectorAll('input[name="fanambadiana"]').forEach(radio => {
@@ -5595,15 +5812,35 @@
     const val = checked ? checked.value : null;
     const enyBlock  = document.getElementById('tahiry-eny');
     const tsiaBlock = document.getElementById('tahiry-tsia');
-    if (enyBlock)  enyBlock.style.display  = (val === 'eny')  ? '' : 'none';
-    if (tsiaBlock) tsiaBlock.style.display = (val === 'tsia') ? '' : 'none';
-    if (val !== 'eny' && enyBlock)
+    if (enyBlock)  enyBlock.style.display  = (val === 'Eny')  ? '' : 'none';
+    if (tsiaBlock) tsiaBlock.style.display = (val === 'Tsia') ? '' : 'none';
+    if (val !== 'Eny' && enyBlock)
       enyBlock.querySelectorAll('input').forEach(el => { if (el.type === 'radio') el.checked = false; else el.value = ''; });
-    if (val !== 'tsia' && tsiaBlock)
+    if (val !== 'Tsia' && tsiaBlock)
       tsiaBlock.querySelectorAll('input[type="text"], textarea').forEach(el => { el.value = ''; });
+    // Conditionnellement obligatoires : Q47 (tahiry_pct) et Q48 (tsy_tahiry_antony)
+    document.querySelectorAll('[name="tahiry_pct"]').forEach(el => { el.required = (val === 'Eny'); });
+    const q47label = document.querySelector('[name="tahiry_pct"]')?.closest('.field')?.querySelector(':scope > label');
+    if (q47label) q47label.classList.toggle('req', val === 'Eny');
+    const q48el = document.querySelector('[name="tsy_tahiry_antony"]');
+    if (q48el) q48el.required = (val === 'Tsia');
+    const q48label = q48el?.closest('.field')?.querySelector(':scope > label');
+    if (q48label) q48label.classList.toggle('req', val === 'Tsia');
   }
   document.querySelectorAll('input[name="tahiry"]').forEach(r => r.addEventListener('change', toggleTahiry));
   toggleTahiry();
+
+  function toggleHerisetra(val) {
+    const block = document.getElementById('herisetra-details');
+    if (!block) return;
+    block.style.display = (val === 'Eny') ? '' : 'none';
+    if (val !== 'Eny') {
+      block.querySelectorAll('input[type="checkbox"]').forEach(el => { el.checked = false; });
+      block.querySelectorAll('input[type="text"], textarea').forEach(el => { el.value = ''; });
+    }
+  }
+  const herisetraChecked = document.querySelector('input[name="herisetra"]:checked');
+  toggleHerisetra(herisetraChecked ? herisetraChecked.value : null);
 
   // ══ SIGNATURE FUNCTIONALITY ══
   const signatures = {
@@ -5753,842 +5990,267 @@
   // Set today's date when page loads
   setTodayDate();
 
-  // ══ GPS FUNCTIONALITY ══
-  let gpsRetryCount = 0;
-  const MAX_GPS_RETRIES = 2;
-  const PRECISION_THRESHOLD = 2; // Précision requise en mètres
+  // ══ GPS FUNCTIONALITY (module FSRP adapté pour Produir2) ══
+  let gpsMap = null;
+  let gpsMarker = null;
+  let gpsCircle = null;
+  let currentGPSData = null;
+  let gpsWatchId = null;
 
-  function getGPSCoordinates() {
-    const gpsXField = document.getElementById('gpsXField');
-    const gpsYField = document.getElementById('gpsYField');
-    const gpsButton = document.getElementById('getGPSBtn');
-    const gpsStatus = document.getElementById('gpsStatus');
-    
-    // Reset the acquisition flag when user requests new GPS coordinates
-    gpsCoordinatesAcquired = false;
+  const MADAGASCAR_BOUNDS = { minLat: -25.6, maxLat: -11.9, minLon: 43.2, maxLon: 50.5 };
 
-    // Check if Geolocation API is available
+  function isInMadagascar(lat, lon) {
+    return lat >= MADAGASCAR_BOUNDS.minLat && lat <= MADAGASCAR_BOUNDS.maxLat &&
+           lon >= MADAGASCAR_BOUNDS.minLon && lon <= MADAGASCAR_BOUNDS.maxLon;
+  }
+
+  // Point d'entrée unique : appelé par le bouton GPS du formulaire
+  function openGPSModal() {
+    const modal = document.getElementById('gpsModal');
+    if (!modal) return;
+    currentGPSData = null;
+    document.getElementById('confirmGPSBtn').disabled = true;
+    document.getElementById('gpsInfoGrid').style.display = 'none';
+    document.getElementById('accuracyIndicator').style.display = 'none';
+    const mis = document.getElementById('manualInputSection');
+    if (mis) mis.classList.remove('active');
+    showGPSStatus('acquiring', '🛰️ Acquisition GPS en cours...');
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    // Use rAF + setTimeout to ensure the modal is fully painted before Leaflet measures the container
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        // Init map and GPS independently so a map failure never blocks GPS acquisition
+        try {
+          initGPSMap();
+        } catch(e) {
+          console.error('❌ Leaflet init échoué:', e);
+          const mapDiv = document.getElementById('gpsMap');
+          if (mapDiv) mapDiv.innerHTML = '<div style="padding:20px;text-align:center;color:#667eea;">🗺️ Carte non disponible<br><small>Utilisez la saisie manuelle ci-dessous</small></div>';
+        }
+        startGPSAcquisition();
+      }, 350);
+    });
+  }
+
+  function initGPSMap() {
+    if (typeof L === 'undefined') throw new Error('Leaflet non chargé');
+    if (gpsMap) { gpsMap.remove(); gpsMap = null; }
+    gpsMarker = null; gpsCircle = null;
+    const defaultCenter = [-18.8792, 47.5079];
+    gpsMap = L.map('gpsMap', { zoomControl: true, preferCanvas: true }).setView(defaultCenter, 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors', maxZoom: 19
+    }).addTo(gpsMap);
+    // Multiple invalidateSize calls to handle animated modals on tablets
+    setTimeout(() => { if (gpsMap) gpsMap.invalidateSize(); }, 100);
+    setTimeout(() => { if (gpsMap) gpsMap.invalidateSize(); }, 400);
+    window.dispatchEvent(new Event('resize'));
+    gpsMap.on('click', function(e) {
+      const lat = e.latlng.lat, lon = e.latlng.lng;
+      document.getElementById('manualLat').value = lat.toFixed(6);
+      document.getElementById('manualLon').value = lon.toFixed(6);
+      updateMapMarker(lat, lon, 10);
+      const mis = document.getElementById('manualInputSection');
+      if (mis && !mis.classList.contains('active')) toggleManualInput();
+    });
+  }
+
+  function startGPSAcquisition() {
     if (!navigator.geolocation) {
-      gpsStatus.className = 'gps-status error';
-      gpsStatus.textContent = '❌ La géolocalisation n\'est pas supportée par votre navigateur.';
-      showToast('Géolocalisation non disponible', 'error');
-      console.error('🚫 Geolocation API non disponible');
+      showGPSStatus('error', '❌ La géolocalisation n\'est pas supportée par votre navigateur');
+      const mis = document.getElementById('manualInputSection');
+      if (mis) mis.classList.add('active');
       return;
     }
-
-    // Check if running on secure context (HTTPS or localhost)
-    const isSecureContext = window.isSecureContext || location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-    if (!isSecureContext) {
-      gpsStatus.className = 'gps-status error';
-      gpsStatus.textContent = '❌ La géolocalisation nécessite une connexion sécurisée (HTTPS).';
-      showToast('HTTPS requis pour GPS', 'error');
-      console.error('🚫 Contexte non sécurisé - HTTPS requis');
-      return;
-    }
-
-    // Update UI to loading state
-    gpsButton.disabled = true;
-    gpsStatus.className = 'gps-status loading';
-    gpsStatus.textContent = '⏳ Acquisition de la position GPS en cours...';
-    console.log('📡 Demande de géolocalisation...');
-
-    // Reset retry count at first attempt
-    if (gpsRetryCount === 0) {
-      console.log('🔄 Première tentative GPS...');
-    }
-
-    // Try to get position with fallback strategy
-    attemptGPSAcquisition(gpsXField, gpsYField, gpsButton, gpsStatus);
-  }
-
-  function attemptGPSAcquisition(gpsXField, gpsYField, gpsButton, gpsStatus) {
-    // Progressive fallback options
-    const options = {
-      enableHighAccuracy: gpsRetryCount === 0, // High accuracy on first try, lower on retry
-      timeout: gpsRetryCount === 0 ? 15000 : 30000, // 15s first, then 30s
-      maximumAge: gpsRetryCount === 0 ? 0 : 60000  // Accept 1-minute old position on retry
-    };
-
-    console.log(`📍 Tentative ${gpsRetryCount + 1}/${MAX_GPS_RETRIES + 1} - Options:`, options);
-
-    // Request current position
+    showGPSStatus('acquiring', '🛰️ Acquisition GPS en cours...');
+    if (gpsWatchId !== null) { navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId = null; }
+    // getCurrentPosition for a fast first fix, then watchPosition for continuous updates
     navigator.geolocation.getCurrentPosition(
-      // Success callback
-      (position) => {
-        const latitude = position.coords.latitude.toFixed(6);
-        const longitude = position.coords.longitude.toFixed(6);
-        const accuracy = position.coords.accuracy.toFixed(2);
-
-        // Reset retry count on success
-        gpsRetryCount = 0;
-
-        // Check precision threshold
-        if (parseFloat(accuracy) < PRECISION_THRESHOLD) {
-          // Precision is good - auto accept
-          acceptGPSCoordinates(latitude, longitude, accuracy);
-        } else {
-          // Precision is not good enough - require manual confirmation
-          offerManualEntry(latitude, longitude, accuracy);
-        }
-      },
-      // Error callback
-      (error) => {
-        console.error(`❌ Erreur GPS (tentative ${gpsRetryCount + 1}):`, error);
-        
-        let errorMessage = '';
-        let canRetry = false;
-
-        switch(error.code) {
-          case error.PERMISSION_DENIED:
-            // On tablets, permission might be temporary - allow one retry
-            if (gpsRetryCount < 1) {
-              errorMessage = '🔄 Vérification des permissions... Nouvelle tentative.';
-              canRetry = true;
-              console.warn('⚠️ Permission refusée - tentative de retry');
-            } else {
-              errorMessage = '❌ Permission GPS refusée. Vérifiez les paramètres de votre appareil:\n' +
-                           '1. Ouvrez Paramètres → Localisation\n' +
-                           '2. Activez la localisation\n' +
-                           '3. Autorisez le navigateur à accéder à votre position';
-              console.error('🚫 Permission GPS définitivement refusée');
-            }
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = gpsRetryCount < MAX_GPS_RETRIES 
-              ? '🔄 Signal GPS faible. Nouvelle tentative...'
-              : '❌ Position GPS indisponible. Assurez-vous que:\n' +
-                '• Le GPS est activé\n' +
-                '• Vous êtes à l\'extérieur ou près d\'une fenêtre\n' +
-                '• Le signal GPS est bon';
-            canRetry = gpsRetryCount < MAX_GPS_RETRIES;
-            console.error('🚫 Position GPS indisponible');
-            break;
-          case error.TIMEOUT:
-            errorMessage = gpsRetryCount < MAX_GPS_RETRIES
-              ? '⏱️ Délai dépassé. Nouvelle tentative avec plus de temps...'
-              : '❌ Le GPS prend trop de temps. Essayez:\n' +
-                '• De vous déplacer à l\'extérieur\n' +
-                '• De réactiver le GPS de votre appareil\n' +
-                '• De réessayer dans quelques instants';
-            canRetry = gpsRetryCount < MAX_GPS_RETRIES;
-            console.error('⏱️ Timeout GPS');
-            break;
-          default:
-            errorMessage = '❌ Erreur inconnue lors de l\'acquisition GPS.';
-            canRetry = gpsRetryCount < MAX_GPS_RETRIES;
-            console.error('❌ Erreur GPS inconnue:', error);
-            break;
-        }
-
-        // Show error message
-        gpsStatus.className = canRetry ? 'gps-status loading' : 'gps-status error';
-        gpsStatus.textContent = errorMessage;
-
-        // Retry if possible
-        if (canRetry) {
-          gpsRetryCount++;
-          showToast(`Nouvelle tentative (${gpsRetryCount}/${MAX_GPS_RETRIES})...`, 'info');
-          
-          // Retry after 2 seconds
-          setTimeout(() => {
-            attemptGPSAcquisition(gpsXField, gpsYField, gpsButton, gpsStatus);
-          }, 2000);
-        } else {
-          // All retries exhausted
-          gpsRetryCount = 0;
-          gpsButton.disabled = false;
-          showToast('Erreur d\'acquisition GPS', 'error');
-        }
-      },
-      options
+      handleGPSSuccess,
+      () => { /* ignore quick error, watchPosition will handle it */ },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
-  }
-
-  // Display GPS map in modal popup
-  function displayGPSMap(latitude, longitude, accuracy) {
-    const gpsMapModal = document.getElementById('gpsMapModal');
-    const gpsMapImage = document.getElementById('gpsMapImage');
-    const mapLat = document.getElementById('mapLat');
-    const mapLng = document.getElementById('mapLng');
-    const mapAccuracy = document.getElementById('mapAccuracy');
-    const reacquireBtn = document.getElementById('reacquireGPSBtn');
-
-    console.log('📍 displayGPSMap appelée avec:', { latitude, longitude, accuracy });
-
-    // Store coordinates for zoom functions
-    mapLatitude = latitude;
-    mapLongitude = longitude;
-
-    // Reset zoom state
-    currentZoomLevel = 1;
-    currentPan = { x: 0, y: 0 };
-    if (gpsMapImage) {
-      gpsMapImage.classList.remove('fullscreen', 'zoomed');
-    }
-
-    // Update coordinates display
-    mapLat.textContent = latitude;
-    mapLng.textContent = longitude;
-    
-    // Update accuracy display with color coding
-    const precisionValue = parseFloat(accuracy);
-    mapAccuracy.textContent = `🎯 Précision: ${accuracy}m`;
-    
-    // Always show acquire button, but color code based on precision
-    if (reacquireBtn) {
-      reacquireBtn.style.display = 'flex';
-      if (precisionValue >= PRECISION_THRESHOLD) {
-        mapAccuracy.style.background = '#fef3c7';
-        mapAccuracy.style.color = '#92400e';
-        mapAccuracy.style.border = '1px solid #f59e0b';
-        console.log(`⚠️ Précision ${accuracy}m >= ${PRECISION_THRESHOLD}m`);
-      } else {
-        mapAccuracy.style.background = '#d1fae5';
-        mapAccuracy.style.color = '#065f46';
-        mapAccuracy.style.border = '1px solid #10b981';
-        console.log(`✅ Précision ${accuracy}m < ${PRECISION_THRESHOLD}m`);
-      }
-    }
-
-    // Show modal immediately
-    if (gpsMapModal) {
-      // Don't reopen if coordinates were already acquired
-      if (gpsCoordinatesAcquired) {
-        console.log('⚠️ Modal GPS non réouverte - coordonnées déjà acquises');
-        // Just update the fields silently
-        const gpsXField = document.getElementById('gpsXField');
-        const gpsYField = document.getElementById('gpsYField');
-        const gpsPrecisionField = document.getElementById('gpsPrecisionField');
-        if (gpsXField && gpsYField) {
-          gpsXField.value = longitude;
-          gpsYField.value = latitude;
-          if (gpsPrecisionField) {
-            gpsPrecisionField.value = accuracy;
-          }
-        }
-        return;
-      }
-      
-      gpsMapModal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-      console.log('✅ Modal GPS affichée');
-      
-      // Start real-time GPS watch for continuous accuracy updates
-      startGPSWatch();
-    } else {
-      console.error('❌ Modal GPS non trouvé!');
-      return;
-    }
-
-    // Create static map image using multiple fallback sources
-    const zoom = 15;
-    const width = 700;
-    const height = 400;
-    
-    // Multiple map sources for fallback
-    const mapSources = [
-      // Source 1: OpenStreetMap static map
-      `https://staticmap.openstreetmap.de/staticmap.php?center=${latitude},${longitude}&zoom=${zoom}&size=${width}x${height}&markers=${latitude},${longitude},lightblue1`,
-      
-      // Source 2: Direct OSM tile (single tile centered on position)
-      generateOSMTileUrl(latitude, longitude, zoom),
-      
-      // Source 3: Alternative static map service
-      `https://render.openstreetmap.org/cgi-bin/export?bbox=${parseFloat(longitude)-0.01},${parseFloat(latitude)-0.01},${parseFloat(longitude)+0.01},${parseFloat(latitude)+0.01}&scale=10000&format=png`,
-    ];
-
-    let currentMapIndex = 0;
-    let loadTimeout = null;
-    
-    function tryLoadMap() {
-      // Clear any existing timeout
-      if (loadTimeout) clearTimeout(loadTimeout);
-      
-      if (currentMapIndex >= mapSources.length) {
-        // All sources failed, show fallback with coordinates
-        console.error('❌ Toutes les sources de carte ont échoué');
-        gpsMapImage.innerHTML = `
-          <div class="map-error">
-            <div style="font-size: 48px; margin-bottom: 16px;">🗺️</div>
-            <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: #059669;">Position GPS enregistrée ✅</div>
-            <div style="font-size: 14px; color: #374151; margin-top: 12px; line-height: 1.6;">
-              <strong>Latitude:</strong> ${latitude}<br>
-              <strong>Longitude:</strong> ${longitude}<br>
-              <strong>Précision:</strong> ${accuracy}m
-            </div>
-            <div style="font-size: 12px; color: #6b7280; margin-top: 16px; padding: 10px; background: #f3f4f6; border-radius: 6px;">
-              📡 <strong>Mode hors ligne</strong><br>
-              La carte n'est pas disponible sans connexion Internet.<br>
-              Vos coordonnées GPS sont <strong>bien enregistrées</strong> et seront incluses dans l'export.
-            </div>
-          </div>
-          <div class="map-marker">📍</div>
-        `;
-        return;
-      }
-
-      const mapImageUrl = mapSources[currentMapIndex];
-      console.log(`🗺️ Chargement carte source ${currentMapIndex + 1}/${mapSources.length}:`, mapImageUrl);
-
-      // Set loading state
-      gpsMapImage.innerHTML = `<div class="map-loading">Chargement de la carte (${currentMapIndex + 1}/${mapSources.length})...</div>`;
-
-      // Create image with timeout
-      const img = new Image();
-      let imageLoaded = false;
-      
-      // Timeout for slow loading
-      loadTimeout = setTimeout(() => {
-        if (!imageLoaded) {
-          console.warn(`⏱️ Timeout pour source ${currentMapIndex + 1}, tentative suivante...`);
-          img.onload = null;
-          img.onerror = null;
-          currentMapIndex++;
-          tryLoadMap();
-        }
-      }, 8000); // 8 second timeout per source
-      
-      img.onload = function() {
-        if (imageLoaded) return;
-        imageLoaded = true;
-        clearTimeout(loadTimeout);
-        
-        console.log(`✅ Carte chargée avec succès (source ${currentMapIndex + 1})`);
-        gpsMapImage.innerHTML = `
-          <img src="${mapImageUrl}" alt="Carte de localisation" style="width: 100%; height: 100%; object-fit: cover;">
-          <div class="map-marker">📍</div>
-        `;
-      };
-      
-      img.onerror = function() {
-        if (imageLoaded) return;
-        imageLoaded = true;
-        clearTimeout(loadTimeout);
-        
-        console.warn(`⚠️ Échec source ${currentMapIndex + 1}, tentative suivante...`);
-        currentMapIndex++;
-        setTimeout(tryLoadMap, 500);
-      };
-      
-      // Start loading
-      img.src = mapImageUrl;
-    }
-
-    // Start loading map
-    tryLoadMap();
-  }
-
-  // Accept GPS coordinates automatically (precision < 2m)
-  function acceptGPSCoordinates(latitude, longitude, accuracy) {
-    const gpsXField = document.getElementById('gpsXField');
-    const gpsYField = document.getElementById('gpsYField');
-    const gpsPrecisionField = document.getElementById('gpsPrecisionField');
-    const gpsButton = document.getElementById('getGPSBtn');
-    const gpsStatus = document.getElementById('gpsStatus');
-    const precisionWarning = document.getElementById('gpsPrecisionWarning');
-    const manualBtn = document.getElementById('manualGPSBtn');
-
-    // Fill the GPS fields
-    gpsXField.value = longitude;
-    gpsYField.value = latitude;
-    if (gpsPrecisionField) {
-      gpsPrecisionField.value = accuracy;
-    }
-    gpsXField.readOnly = true;
-    gpsYField.readOnly = true;
-
-    // Update UI to success state
-    gpsStatus.className = 'gps-status success';
-    gpsStatus.textContent = `✅ Position GPS acceptée automatiquement! Précision: ${accuracy}m (< ${PRECISION_THRESHOLD}m)`;
-    gpsButton.disabled = false;
-    precisionWarning.style.display = 'none';
-    manualBtn.style.display = 'none';
-
-    // Display map with location
-    displayGPSMap(latitude, longitude, accuracy);
-
-    showToast(`✅ GPS précis (${accuracy}m) - Accepté automatiquement`, 'success');
-    console.log(`✅ GPS auto-accepté: Lat=${latitude}, Lng=${longitude}, Précision=${accuracy}m`);
-
-    // Close modal automatically after 2 seconds for good precision
+    gpsWatchId = navigator.geolocation.watchPosition(
+      handleGPSSuccess, handleGPSError,
+      { enableHighAccuracy: true, timeout: 30000, maximumAge: 5000 }
+    );
+    // Show manual input fallback automatically if no GPS fix after 15 seconds
     setTimeout(() => {
-      gpsCoordinatesAcquired = true; // Set flag before closing
-      closeGPSModal();
-      console.log('🗺️ Modal GPS fermée automatiquement (bonne précision)');
-    }, 2000);
-
-    // Trigger autosave
-    triggerAutosave();
+      if (!currentGPSData) {
+        const mis = document.getElementById('manualInputSection');
+        if (mis && !mis.classList.contains('active')) {
+          mis.classList.add('active');
+          showGPSStatus('acquiring', '🛰️ GPS en cours... Vous pouvez aussi saisir manuellement ci-dessous.');
+        }
+      }
+    }, 15000);
   }
 
-  // Offer manual entry (precision >= 2m)
-  function offerManualEntry(latitude, longitude, accuracy) {
-    const gpsXField = document.getElementById('gpsXField');
-    const gpsYField = document.getElementById('gpsYField');
-    const gpsPrecisionField = document.getElementById('gpsPrecisionField');
-    const gpsButton = document.getElementById('getGPSBtn');
-    const gpsStatus = document.getElementById('gpsStatus');
-    const precisionWarning = document.getElementById('gpsPrecisionWarning');
-    const manualBtn = document.getElementById('manualGPSBtn');
-
-    // Fill fields but keep them editable
-    gpsXField.value = longitude;
-    gpsYField.value = latitude;
-    if (gpsPrecisionField) {
-      gpsPrecisionField.value = accuracy;
-    }
-    gpsXField.readOnly = false;
-    gpsYField.readOnly = false;
-
-    // Show warning about precision
-    gpsStatus.className = 'gps-status error';
-    gpsStatus.textContent = `⚠️ Précision insuffisante: ${accuracy}m (seuil: ${PRECISION_THRESHOLD}m)`;
-    
-    precisionWarning.style.display = 'block';
-    precisionWarning.innerHTML = `
-      <strong>⚠️ Précision GPS insuffisante</strong><br>
-      Précision actuelle: <strong>${accuracy}m</strong> (seuil requis: <strong>${PRECISION_THRESHOLD}m</strong>)<br><br>
-      🔴 Options:<br>
-      • <strong>Saisie manuelle</strong>: Cliquez sur le bouton orange ci-dessus pour corriger<br>
-      • <strong>Réessayer</strong>: Améliorez le signal GPS et cliquez sur "Obtenir ma position GPS"<br>
-      • <strong>Déplacer</strong>: Allez à l'extérieur pour un meilleur signal
-    `;
-
-    // Show manual entry button
-    manualBtn.style.display = 'flex';
-    gpsButton.disabled = false;
-
-    // Display map anyway
-    displayGPSMap(latitude, longitude, accuracy);
-
-    showToast(`⚠️ Précision GPS: ${accuracy}m - Vérification requise`, 'error');
-    console.warn(`⚠️ Précision insuffisante: ${accuracy}m >= ${PRECISION_THRESHOLD}m - Saisie manuelle proposée`);
-  }
-
-  // Enable manual GPS entry
-  function enableManualGPSEntry() {
-    const gpsXField = document.getElementById('gpsXField');
-    const gpsYField = document.getElementById('gpsYField');
-    const gpsStatus = document.getElementById('gpsStatus');
-    const precisionWarning = document.getElementById('gpsPrecisionWarning');
-
-    // Make fields editable
-    gpsXField.readOnly = false;
-    gpsYField.readOnly = false;
-    gpsXField.focus();
-
-    // Update status
-    gpsStatus.className = 'gps-status loading';
-    gpsStatus.textContent = '✏️ Mode saisie manuelle activé - Entrez les coordonnées GPS';
-
-    precisionWarning.style.display = 'block';
-    precisionWarning.innerHTML = `
-      <strong>✏️ Saisie manuelle des coordonnées GPS</strong><br>
-      Entrez les coordonnées GPS précises dans les champs ci-dessus.<br><br>
-      <strong>Format attendu:</strong><br>
-      • Longitude (GPS X): Ex: 47.123456<br>
-      • Latitude (GPS Y): Ex: -18.987654<br><br>
-      Les données seront enregistrées automatiquement.
-    `;
-
-    showToast('✏️ Saisie manuelle activée', 'info');
-    console.log('✏️ Saisie manuelle GPS activée');
-
-    // Trigger autosave when fields change
-    const autoSaveHandler = () => triggerAutosave();
-    gpsXField.addEventListener('input', autoSaveHandler);
-    gpsYField.addEventListener('input', autoSaveHandler);
-  }
-
-  // Generate OSM tile URL for a specific location
-  function generateOSMTileUrl(lat, lng, zoom) {
-    const n = Math.pow(2, zoom);
-    const xtile = Math.floor((parseFloat(lng) + 180) / 360 * n);
-    const ytile = Math.floor((1 - Math.log(Math.tan(parseFloat(lat) * Math.PI / 180) + 1 / Math.cos(parseFloat(lat) * Math.PI / 180)) / Math.PI) / 2 * n);
-    
-    return `https://tile.openstreetmap.org/${zoom}/${xtile}/${ytile}.png`;
-  }
-
-  // Map zoom state
-  let currentZoomLevel = 1;
-  let mapLatitude = null;
-  let mapLongitude = null;
-  let isPanning = false;
-  let panStart = { x: 0, y: 0 };
-  let currentPan = { x: 0, y: 0 };
-  let gpsWatchId = null; // ID for GPS watch position
-  let gpsCoordinatesAcquired = false; // Flag to prevent reopening modal after acquisition
-
-  // Close GPS modal
-  // Acquire GPS coordinates from modal (on button click)
-  function acquireGPSFromModal() {
-    const mapLat = document.getElementById('mapLat');
-    const mapLng = document.getElementById('mapLng');
-    const mapAccuracy = document.getElementById('mapAccuracy');
-    const gpsXField = document.getElementById('gpsXField');
-    const gpsYField = document.getElementById('gpsYField');
-    const gpsPrecisionField = document.getElementById('gpsPrecisionField');
-    const gpsStatus = document.getElementById('gpsStatus');
-    
-    if (!mapLat || !mapLng || !gpsXField || !gpsYField) {
-      console.error('❌ Éléments GPS non trouvés');
+  function handleGPSSuccess(position) {
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
+    const accuracy = position.coords.accuracy;
+    currentGPSData = { latitude: lat, longitude: lon, accuracy, timestamp: new Date(position.timestamp) };
+    if (!isInMadagascar(lat, lon)) {
+      showGPSStatus('error', '⚠️ Les coordonnées acquises ne sont pas à Madagascar !');
+      updateGPSDisplay(lat, lon, accuracy);
+      updateMapMarker(lat, lon, accuracy);
+      document.getElementById('confirmGPSBtn').disabled = false;
       return;
     }
-    
-    // Get current coordinates from modal display
-    const latitude = mapLat.textContent;
-    const longitude = mapLng.textContent;
-    
-    // Extract accuracy from text (format: "🎯 Précision: XXm")
-    let accuracy = '0';
-    if (mapAccuracy) {
-      const accuracyText = mapAccuracy.textContent;
-      const match = accuracyText.match(/([0-9.]+)m/);
-      if (match) {
-        accuracy = match[1];
-      }
+    updateGPSDisplay(lat, lon, accuracy);
+    updateMapMarker(lat, lon, accuracy);
+    updateAccuracyIndicator(accuracy);
+    if (accuracy < 2) {
+      showGPSStatus('success', '✅ Coordonnées acquises automatiquement (Précision: ' + accuracy.toFixed(2) + 'm < 2m)');
+      setTimeout(() => confirmGPSCoordinates(), 1500);
+    } else if (accuracy <= 5) {
+      showGPSStatus('success', '✅ Signal GPS acquis. Précision: ' + accuracy.toFixed(2) + 'm — confirmez pour valider');
+      document.getElementById('confirmGPSBtn').disabled = false;
+    } else {
+      showGPSStatus('success', '📡 Signal GPS reçu. Précision: ' + accuracy.toFixed(2) + 'm — en attente d\'un meilleur signal...');
+      // confirm button stays disabled until precision reaches ≤ 5m
     }
-    
-    // Fill the GPS fields
-    gpsXField.value = longitude;
-    gpsYField.value = latitude;
-    if (gpsPrecisionField) {
-      gpsPrecisionField.value = accuracy;
+  }
+
+  function handleGPSError(error) {
+    let message = '';
+    switch(error.code) {
+      case error.PERMISSION_DENIED:    message = '❌ Permission de géolocalisation refusée'; break;
+      case error.POSITION_UNAVAILABLE: message = '❌ Position GPS non disponible'; break;
+      case error.TIMEOUT:              message = '⏱️ Délai d\'acquisition GPS dépassé'; break;
+      default:                         message = '❌ Erreur GPS inconnue';
     }
-    
-    // Make fields read-only
-    gpsXField.readOnly = true;
-    gpsYField.readOnly = true;
-    
-    // Update status
-    if (gpsStatus) {
-      gpsStatus.className = 'gps-status success';
-      gpsStatus.textContent = `✅ Coordonnées GPS acquises! Précision: ${accuracy}m`;
+    showGPSStatus('error', message);
+    setTimeout(() => {
+      const mis = document.getElementById('manualInputSection');
+      if (mis && !mis.classList.contains('active')) toggleManualInput();
+    }, 2000);
+  }
+
+  function showGPSStatus(type, message) {
+    const statusDiv = document.getElementById('gpsStatus');
+    if (!statusDiv) return;
+    statusDiv.className = 'gps-status ' + type;
+    statusDiv.innerHTML = type === 'acquiring'
+      ? '<div class="spinner"></div> ' + message
+      : message;
+  }
+
+  function updateGPSDisplay(lat, lon, accuracy) {
+    document.getElementById('gpsInfoGrid').style.display = 'grid';
+    document.getElementById('displayLat').textContent = lat.toFixed(6);
+    document.getElementById('displayLon').textContent = lon.toFixed(6);
+    document.getElementById('displayAccuracy').textContent = accuracy.toFixed(2) + ' m';
+    document.getElementById('displayTime').textContent = new Date().toLocaleTimeString('fr-FR');
+  }
+
+  function updateMapMarker(lat, lon, accuracy) {
+    if (!gpsMap) return;
+    if (gpsMarker) gpsMap.removeLayer(gpsMarker);
+    if (gpsCircle) gpsMap.removeLayer(gpsCircle);
+    gpsMarker = L.marker([lat, lon]).addTo(gpsMap);
+    gpsMarker.bindPopup(`<b>Position GPS</b><br>Lat: ${lat.toFixed(6)}<br>Lon: ${lon.toFixed(6)}<br>Précision: ${accuracy.toFixed(2)}m`).openPopup();
+    const color = accuracy <= 0.25 ? '#4CAF50' : accuracy <= 5 ? '#2196F3' : accuracy <= 10 ? '#FFC107' : '#F44336';
+    gpsCircle = L.circle([lat, lon], { radius: accuracy, color, fillColor: color, fillOpacity: 0.2 }).addTo(gpsMap);
+    gpsMap.setView([lat, lon], 16);
+  }
+
+  function updateAccuracyIndicator(accuracy) {
+    const indicator = document.getElementById('accuracyIndicator');
+    if (!indicator) return;
+    indicator.style.display = 'block';
+    let cls, msg;
+    if      (accuracy < 2)    { cls = 'accuracy-excellent'; msg = '🎯 BONNE PRÉCISION (' + accuracy.toFixed(2) + 'm) — Acquisition automatique en cours...'; }
+    else if (accuracy <= 5)    { cls = 'accuracy-good';      msg = '✅ PRÉCISION ACCEPTABLE (' + accuracy.toFixed(2) + 'm) — Confirmez manuellement'; }
+    else if (accuracy <= 15)   { cls = 'accuracy-fair';      msg = '⚠️ PRÉCISION MOYENNE (' + accuracy.toFixed(2) + 'm) — Attendez un meilleur signal'; }
+    else                        { cls = 'accuracy-poor';      msg = '❌ FAIBLE PRÉCISION (' + accuracy.toFixed(2) + 'm) — Déplacez-vous à l\'extérieur'; }
+    indicator.className = 'accuracy-indicator ' + cls;
+    indicator.textContent = msg;
+  }
+
+  function toggleManualInput() {
+    const section = document.getElementById('manualInputSection');
+    if (!section) return;
+    section.classList.toggle('active');
+    if (section.classList.contains('active') && currentGPSData) {
+      document.getElementById('manualLat').value = currentGPSData.latitude.toFixed(6);
+      document.getElementById('manualLon').value = currentGPSData.longitude.toFixed(6);
     }
-    
-    console.log(`✅ GPS acquis depuis modal: Lat=${latitude}, Lng=${longitude}, Précision=${accuracy}m`);
-    
-    // Show success toast
-    showToast(`✅ GPS acquis (${accuracy}m) - Coordonnées enregistrées`, 'success');
-    
-    // Set flag to prevent modal from reopening
-    gpsCoordinatesAcquired = true;
-    
-    // Close the modal
+  }
+
+  function updateMapFromManualInput() {
+    let lat = parseFloat(document.getElementById('manualLat').value);
+    let lon = parseFloat(document.getElementById('manualLon').value);
+    if (isNaN(lat) || isNaN(lon)) { alert('⚠️ Veuillez entrer des coordonnées valides'); return; }
+    lat = parseFloat(lat.toFixed(6)); lon = parseFloat(lon.toFixed(6));
+    document.getElementById('manualLat').value = lat.toFixed(6);
+    document.getElementById('manualLon').value = lon.toFixed(6);
+    if (!isInMadagascar(lat, lon)) {
+      if (!confirm('⚠️ ATTENTION: Ces coordonnées ne sont pas à Madagascar!\n\nLat: ' + lat.toFixed(6) + '\nLon: ' + lon.toFixed(6) + '\n\nVoulez-vous continuer quand même?')) return;
+    }
+    currentGPSData = { latitude: lat, longitude: lon, accuracy: 10, timestamp: new Date(), manual: true };
+    updateGPSDisplay(lat, lon, 10);
+    updateMapMarker(lat, lon, 10);
+    showGPSStatus('success', '✅ Coordonnées saisies manuellement');
+    document.getElementById('confirmGPSBtn').disabled = false;
+  }
+
+  function confirmGPSCoordinates() {
+    if (!currentGPSData) { alert('⚠️ Aucune coordonnée disponible'); return; }
+    if (gpsWatchId !== null) { navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId = null; }
+    const lat = currentGPSData.latitude.toFixed(6);
+    const lon = currentGPSData.longitude.toFixed(6);
+    const accuracy = currentGPSData.accuracy.toFixed(2);
+    // Remplir les champs GPS du formulaire Produir2
+    const gpsXField = document.getElementById('gpsXField');
+    const gpsYField = document.getElementById('gpsYField');
+    const gpsPrecisionField = document.getElementById('gpsPrecisionField');
+    if (gpsXField) { gpsXField.value = lon; gpsXField.style.background = '#d4edda'; setTimeout(() => gpsXField.style.background = '', 2000); }
+    if (gpsYField) { gpsYField.value = lat; gpsYField.style.background = '#d4edda'; setTimeout(() => gpsYField.style.background = '', 2000); }
+    if (gpsPrecisionField) gpsPrecisionField.value = accuracy;
+    // Mise à jour du statut dans le formulaire
+    const gpsStatus = document.getElementById('gpsStatus');
+    if (gpsStatus) { gpsStatus.className = 'gps-status success'; gpsStatus.textContent = `✅ GPS: ${lat}, ${lon} (précision: ${accuracy}m)`; }
+    showToast(`✅ GPS acquis (précision: ${accuracy}m)`, 'success');
     closeGPSModal();
-    
-    // Trigger autosave
     triggerAutosave();
   }
 
   function closeGPSModal() {
-    const gpsMapModal = document.getElementById('gpsMapModal');
-    const gpsMapImage = document.getElementById('gpsMapImage');
-    
-    // Stop GPS watch if active
-    stopGPSWatch();
-    
-    if (gpsMapModal) {
-      gpsMapModal.style.display = 'none';
-      document.body.style.overflow = '';
-      
-      // Reset zoom
-      if (gpsMapImage) {
-        gpsMapImage.classList.remove('fullscreen', 'zoomed');
-        const img = gpsMapImage.querySelector('img');
-        if (img) {
-          img.style.transform = 'scale(1) translate(0, 0)';
-        }
-      }
-      currentZoomLevel = 1;
-      currentPan = { x: 0, y: 0 };
-      
-      console.log('🗺️ Modal GPS fermée');
-    }
+    if (gpsWatchId !== null) { navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId = null; }
+    const modal = document.getElementById('gpsModal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+    if (gpsMap) { gpsMap.remove(); gpsMap = null; }
+    currentGPSData = null;
   }
 
-  // Stop GPS watch
-  function stopGPSWatch() {
-    if (gpsWatchId !== null) {
-      navigator.geolocation.clearWatch(gpsWatchId);
-      gpsWatchId = null;
-      console.log('⏸️ Surveillance GPS arrêtée');
-    }
-  }
-
-  // Update GPS display in real-time
-  function updateGPSDisplay(latitude, longitude, accuracy) {
-    const mapLat = document.getElementById('mapLat');
-    const mapLng = document.getElementById('mapLng');
-    const mapAccuracy = document.getElementById('mapAccuracy');
-    const reacquireBtn = document.getElementById('reacquireGPSBtn');
-    
-    if (!mapLat || !mapLng || !mapAccuracy) return;
-    
-    // Update coordinates
-    mapLat.textContent = latitude;
-    mapLng.textContent = longitude;
-    
-    // Update accuracy and button visibility
-    const precisionValue = parseFloat(accuracy);
-    mapAccuracy.textContent = `🎯 Précision: ${accuracy}m`;
-    
-    if (reacquireBtn) {
-      reacquireBtn.style.display = 'flex';
-      if (precisionValue >= PRECISION_THRESHOLD) {
-        mapAccuracy.style.background = '#fef3c7';
-        mapAccuracy.style.color = '#92400e';
-        mapAccuracy.style.border = '1px solid #f59e0b';
-      } else {
-        mapAccuracy.style.background = '#d1fae5';
-        mapAccuracy.style.color = '#065f46';
-        mapAccuracy.style.border = '1px solid #10b981';
-      }
-    }
-    
-    console.log(`🔄 Mise à jour GPS: ${latitude}, ${longitude}, précision: ${accuracy}m`);
-  }
-
-  // Start real-time GPS watch
-  function startGPSWatch() {
-    // Stop any existing watch
-    stopGPSWatch();
-    
-    if (!navigator.geolocation) {
-      console.error('❌ Geolocation non disponible');
-      return;
-    }
-    
-    const watchOptions = {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0
-    };
-    
-    console.log('▶️ Démarrage surveillance GPS en temps réel...');
-    
-    gpsWatchId = navigator.geolocation.watchPosition(
-      // Success callback
-      (position) => {
-        const latitude = position.coords.latitude.toFixed(6);
-        const longitude = position.coords.longitude.toFixed(6);
-        const accuracy = position.coords.accuracy.toFixed(2);
-        
-        // Update display in real-time
-        updateGPSDisplay(latitude, longitude, accuracy);
-        
-        // Also update the GPS fields if precision is good
-        const gpsXField = document.getElementById('gpsXField');
-        const gpsYField = document.getElementById('gpsYField');
-        if (parseFloat(accuracy) < PRECISION_THRESHOLD && gpsXField && gpsYField) {
-          gpsXField.value = longitude;
-          gpsYField.value = latitude;
-        }
-      },
-      // Error callback
-      (error) => {
-        console.warn('⚠️ Erreur watch GPS:', error.message);
-        // Don't stop watch on error - GPS might recover
-      },
-      watchOptions
-    );
-    
-    console.log('✅ Surveillance GPS active (ID:', gpsWatchId, ')');
-  }
-
-  // Zoom in map
-  function zoomInMap() {
-    if (currentZoomLevel >= 3) return; // Max zoom
-    currentZoomLevel += 0.5;
-    updateMapZoom();
-    console.log('🔍 Zoom in:', currentZoomLevel);
-  }
-
-  // Zoom out map
-  function zoomOutMap() {
-    if (currentZoomLevel <= 1) return; // Min zoom
-    currentZoomLevel -= 0.5;
-    if (currentZoomLevel < 1) currentZoomLevel = 1;
-    updateMapZoom();
-    console.log('🔍 Zoom out:', currentZoomLevel);
-  }
-
-  // Update map zoom
-  function updateMapZoom() {
-    const gpsMapImage = document.getElementById('gpsMapImage');
-    const img = gpsMapImage?.querySelector('img');
-    
-    if (img) {
-      if (currentZoomLevel > 1) {
-        gpsMapImage.classList.add('zoomed');
-      } else {
-        gpsMapImage.classList.remove('zoomed');
-        currentPan = { x: 0, y: 0 };
-      }
-      img.style.transform = `scale(${currentZoomLevel}) translate(${currentPan.x}px, ${currentPan.y}px)`;
-    }
-  }
-
-  // Toggle fullscreen
-  function toggleFullscreen() {
-    const gpsMapImage = document.getElementById('gpsMapImage');
-    
-    if (gpsMapImage) {
-      gpsMapImage.classList.toggle('fullscreen');
-      console.log('⛶ Fullscreen toggled');
-    }
-  }
-
-  // Pan map when zoomed
-  function initMapPanning() {
-    const gpsMapImage = document.getElementById('gpsMapImage');
-    if (!gpsMapImage) return;
-
-    gpsMapImage.addEventListener('mousedown', (e) => {
-      if (currentZoomLevel <= 1) return;
-      isPanning = true;
-      panStart = { x: e.clientX - currentPan.x, y: e.clientY - currentPan.y };
-      e.preventDefault();
-    });
-
-    document.addEventListener('mousemove', (e) => {
-      if (!isPanning || currentZoomLevel <= 1) return;
-      currentPan = {
-        x: e.clientX - panStart.x,
-        y: e.clientY - panStart.y
-      };
-      updateMapZoom();
-    });
-
-    document.addEventListener('mouseup', () => {
-      isPanning = false;
-    });
-
-    // Touch support
-    gpsMapImage.addEventListener('touchstart', (e) => {
-      if (currentZoomLevel <= 1) return;
-      isPanning = true;
-      const touch = e.touches[0];
-      panStart = { x: touch.clientX - currentPan.x, y: touch.clientY - currentPan.y };
-      e.preventDefault();
-    });
-
-    gpsMapImage.addEventListener('touchmove', (e) => {
-      if (!isPanning || currentZoomLevel <= 1) return;
-      const touch = e.touches[0];
-      currentPan = {
-        x: touch.clientX - panStart.x,
-        y: touch.clientY - panStart.y
-      };
-      updateMapZoom();
-    });
-
-    gpsMapImage.addEventListener('touchend', () => {
-      isPanning = false;
-    });
-  }
-
-  // Initialize GPS button and controls
   function initGPSButton() {
     const gpsButton = document.getElementById('getGPSBtn');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const modalOverlay = document.querySelector('.gps-modal-overlay');
-    const zoomInBtn = document.getElementById('zoomInBtn');
-    const zoomOutBtn = document.getElementById('zoomOutBtn');
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
-    const manualGPSBtn = document.getElementById('manualGPSBtn');
-    const reacquireBtn = document.getElementById('reacquireGPSBtn');
-    
-    console.log('🔧 Initialisation GPS controls...');
-    console.log('closeModalBtn:', closeModalBtn);
-    console.log('modalOverlay:', modalOverlay);
-    
     if (gpsButton) {
-      gpsButton.addEventListener('click', getGPSCoordinates);
-      console.log('✅ Bouton GPS initialisé');
+      gpsButton.addEventListener('click', openGPSModal);
     }
-
-    if (manualGPSBtn) {
-      manualGPSBtn.addEventListener('click', enableManualGPSEntry);
-      console.log('✅ Bouton saisie manuelle initialisé');
-    } else {
-      console.warn('⚠️ Bouton saisie manuelle non trouvé');
-    }
-
-    if (reacquireBtn) {
-      reacquireBtn.addEventListener('click', () => {
-        console.log('🔄 Réacquisition GPS demandée depuis le modal');
-        // Close modal first
-        closeGPSModal();
-        // Trigger GPS acquisition
-        setTimeout(() => {
-          getGPSCoordinates();
-        }, 300);
-      });
-      console.log('✅ Bouton réacquisition GPS initialisé');
-    } else {
-      console.warn('⚠️ Bouton réacquisition non trouvé');
-    }
-
-    if (closeModalBtn) {
-      closeModalBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('❌ Bouton fermeture cliqué');
-        closeGPSModal();
-      });
-      console.log('✅ Bouton fermeture initialisé');
-    } else {
-      console.warn('⚠️ Bouton fermeture non trouvé');
-    }
-
-    if (modalOverlay) {
-      modalOverlay.addEventListener('click', (e) => {
-        console.log('🖱️ Overlay cliqué');
-        closeGPSModal();
-      });
-      console.log('✅ Overlay initialisé');
-    } else {
-      console.warn('⚠️ Overlay non trouvé');
-    }
-
-    if (zoomInBtn) {
-      zoomInBtn.addEventListener('click', zoomInMap);
-      console.log('✅ Zoom In initialisé');
-    }
-
-    if (zoomOutBtn) {
-      zoomOutBtn.addEventListener('click', zoomOutMap);
-      console.log('✅ Zoom Out initialisé');
-    }
-
-    if (fullscreenBtn) {
-      fullscreenBtn.addEventListener('click', toggleFullscreen);
-      console.log('✅ Fullscreen initialisé');
-    }
-
-    // Initialize panning
-    initMapPanning();
-
-    // Close modal with ESC key
+    // Fermeture par la touche Échap
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        const gpsMapModal = document.getElementById('gpsMapModal');
-        if (gpsMapModal && gpsMapModal.style.display === 'flex') {
-          console.log('⌨️ ESC pressé - fermeture modal');
-          closeGPSModal();
-        }
+        const modal = document.getElementById('gpsModal');
+        if (modal && modal.style.display === 'block') closeGPSModal();
       }
     });
-    
+    // Fermeture en cliquant hors du modal
+    document.getElementById('gpsModal')?.addEventListener('click', function(e) {
+      if (e.target === this) closeGPSModal();
+    });
     console.log('✅ Tous les contrôles GPS initialisés');
   }
-
   // Initialize when DOM is ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initGPSButton);
+    document.addEventListener('DOMContentLoaded', () => { initGPSButton(); _initCropCanvasEvents(); });
   } else {
     initGPSButton();
+    _initCropCanvasEvents();
   }
 
   // ══ AUTOSAVE FUNCTIONALITY ══
@@ -7057,17 +6719,21 @@
   function handleLogin(event) {
     event.preventDefault();
     
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
     
     // Simple credentials (you can modify these or use a more secure method)
     const validCredentials = [
       { username: 'admin', password: 'admin123', fullName: 'Administrateur' },
-      { username: 'belinda', password: 'enquete123', fullName: 'RANDRIAMIHAJA Belinda' },
       { username: 'angelica', password: 'enquete123', fullName: 'FITSAHARANA HASIMPIDERANA Onjaniaina Angelica Michelle' },
-      { username: 'narindra', password: 'enquete123', fullName: 'RAZAFIMAHEFA Holy Narindra' },
-      { username: 'rota', password: 'enquete123', fullName: 'RANDRIANOMENJANAHARY Rota Soafara' },
+      { username: 'belinda', password: 'enquete123', fullName: 'RANDRIAMIHAJA Belinda' }, 
+      { username: 'heriniaina', password: 'enquete123', fullName: 'ANDRIAMPARANY Heriniaina Théodore' }, 
       { username: 'mamitiana', password: 'enquete123', fullName: 'RAMILIARINARIVO Mamy Tiana' },
+      { username: 'marcellin', password: 'enquete123', fullName: 'RADY Marcelin' },
+      { username: 'mathieu', password: 'enquete123', fullName: 'RAMANANDRAIBE Solly Mathieu' },
+      { username: 'narindra', password: 'enquete123', fullName: 'RAZAFIMAHEFA Holy Narindra' },
+      { username: 'onja', password: 'enquete123', fullName: '	RANAIVOSON Nantenaina Onjatiana Erika' },
+      { username: 'rota', password: 'enquete123', fullName: 'RANDRIANOMENJANAHARY Rota Soafara' },
       { username: 'tanjona', password: 'enquete123', fullName: 'ELIASY HERY TANJONA Andrianony' },
       { username: 'supervisor', password: 'super123', fullName: 'Superviseur' }
     ];
@@ -7395,56 +7061,152 @@
 body.printing .section-card {
   animation: none !important;
 }
+
+/* ── CROP MODAL — style GPS FSRP ── */
+#cropModal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.7);
+  overflow: auto;
+  animation: fadeIn 0.3s ease-in-out;
+}
+#cropModal .gps-modal-content {
+  margin: 2% auto;
+  width: 92%;
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+}
+#cropModal .gps-modal-header {
+  border-radius: 12px 12px 0 0;
+}
+#cropModal .gps-modal-body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.crop-hint {
+  font-size: 13px;
+  color: #666;
+  padding: 10px 20px;
+  background: #f8f9fa;
+  text-align: center;
+  border-bottom: 1px solid #e9ecef;
+}
+.crop-canvas-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #111;
+  overflow: hidden;
+  max-height: 55vh;
+  touch-action: none;
+  -webkit-overflow-scrolling: none;
+  overscroll-behavior: none;
+}
+#cropCanvas {
+  display: block;
+  max-width: 100%;
+  max-height: 55vh;
+  cursor: crosshair;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.crop-count-badge {
+  font-size: 13px;
+  color: #888;
+  align-self: center;
+  margin-right: auto;
+}
+@media (max-width: 768px) {
+  #cropModal .gps-modal-content { width: 97%; margin: 4% auto; }
+  #cropModal .gps-modal-actions { flex-direction: column; }
+  #cropModal .gps-modal-actions button { width: 100%; }
+}
 </style>
 
 </div><!-- /#mainContent -->
 
-<!-- ══ GPS MAP MODAL ══ -->
-<div id="gpsMapModal" class="gps-modal" style="display: none;">
-  <div class="gps-modal-overlay"></div>
+<!-- ══ CROP MODAL — style GPS FSRP ══ -->
+<div id="cropModal">
   <div class="gps-modal-content">
     <div class="gps-modal-header">
-      <div class="modal-header-left">
-        <span class="modal-icon">🗺️</span>
-        <h3 class="modal-title">Localisation GPS</h3>
-      </div>
-      <button type="button" id="closeModalBtn" class="close-modal-btn">
-        <span>✕</span>
-      </button>
+      <h2>✂️ Rogner l'image / Fanapahana ny sary</h2>
+      <button class="gps-close" type="button" onclick="cancelCrop()">&times;</button>
     </div>
     <div class="gps-modal-body">
-      <div id="gpsMapImage" class="gps-map-image">
-        <div class="map-loading">Chargement de la carte...</div>
+      <p class="crop-hint">✋ Tariho ny preny mba hodinihana ny faritra honapahana &nbsp;•&nbsp; Glissez pour sélectionner la zone à rogner</p>
+      <div class="crop-canvas-wrapper">
+        <canvas id="cropCanvas"></canvas>
       </div>
-      <div class="map-zoom-controls">
-        <button type="button" id="zoomInBtn" class="zoom-btn" title="Agrandir">
-          <span>🔍+</span>
-        </button>
-        <button type="button" id="zoomOutBtn" class="zoom-btn" title="Réduire">
-          <span>🔍−</span>
-        </button>
-        <button type="button" id="fullscreenBtn" class="zoom-btn" title="Plein écran">
-          <span>⛶</span>
-        </button>
+    </div>
+    <div class="gps-modal-actions" style="padding: 16px 24px; border-top: 2px solid #e9ecef;">
+      <span id="cropQueueBadge" class="crop-count-badge"></span>
+      <button type="button" class="btn-secondary" style="background:#e74c3c;" onclick="cancelCrop()">❌ Hanafoana</button>
+      <button type="button" class="btn-secondary" onclick="skipCrop()">🖼️ Tsy hanapahana</button>
+      <button type="button" class="btn-primary" onclick="applyCrop()">✂️ Manapaka</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ GPS MODAL (FSRP style) ══ -->
+<div id="gpsModal" class="gps-modal">
+  <div class="gps-modal-content">
+    <div class="gps-modal-header">
+      <h2>🛰️ Acquisition GPS</h2>
+      <button class="gps-close" onclick="closeGPSModal()">&times;</button>
+    </div>
+    <div class="gps-modal-body">
+      <div id="gpsStatus" class="gps-status acquiring">
+        <div class="spinner"></div>
+        Acquisition des coordonnées GPS en cours...
       </div>
-      <div class="gps-modal-footer">
-        <div class="coord-display">
-          <div class="coord-item">
-            <span class="coord-label">📍 Latitude</span>
-            <span id="mapLat" class="coord-value">-</span>
+      <div id="gpsMap"></div>
+      <div id="accuracyIndicator" style="display: none;"></div>
+      <div class="gps-info-grid" id="gpsInfoGrid" style="display: none;">
+        <div class="gps-info-card">
+          <label>📍 Latitude</label>
+          <div class="value" id="displayLat">-</div>
+        </div>
+        <div class="gps-info-card">
+          <label>📍 Longitude</label>
+          <div class="value" id="displayLon">-</div>
+        </div>
+        <div class="gps-info-card">
+          <label>🎯 Précision</label>
+          <div class="value" id="displayAccuracy">-</div>
+        </div>
+        <div class="gps-info-card">
+          <label>🕐 Heure</label>
+          <div class="value" id="displayTime">-</div>
+        </div>
+      </div>
+      <div id="manualInputSection" class="gps-manual-input">
+        <h3 style="margin-bottom: 15px; color: #667eea;">✏️ Saisie manuelle des coordonnées</h3>
+        <p style="color: #666; font-size: 0.9em; margin-bottom: 15px;">
+          Vous pouvez cliquer directement sur la carte pour placer le marqueur ou saisir les coordonnées ci-dessous.
+        </p>
+        <div class="gps-form-row">
+          <div class="gps-form-group">
+            <label>Latitude *</label>
+            <input type="number" id="manualLat" step="0.000001" placeholder="-18.123456" min="-90" max="90">
           </div>
-          <div class="coord-divider"></div>
-          <div class="coord-item">
-            <span class="coord-label">📍 Longitude</span>
-            <span id="mapLng" class="coord-value">-</span>
+          <div class="gps-form-group">
+            <label>Longitude *</label>
+            <input type="number" id="manualLon" step="0.000001" placeholder="47.123456" min="-180" max="180">
           </div>
         </div>
-        <div id="mapAccuracy" class="accuracy-info"></div>
-        <button type="button" id="reacquireGPSBtn" class="reacquire-gps-btn" onclick="acquireGPSFromModal()">
-          <span class="btn-icon">📍</span>
-          <span class="btn-text">Acquérir GPS</span>
-        </button>
+        <button type="button" class="btn-secondary" onclick="updateMapFromManualInput()">🗺️ Afficher sur la carte</button>
       </div>
+    </div>
+    <div class="gps-modal-actions">
+      <button type="button" onclick="closeGPSModal()" class="btn-secondary">Annuler</button>
+      <button type="button" id="confirmGPSBtn" onclick="confirmGPSCoordinates()" class="btn-primary" disabled>✓ Confirmer les coordonnées</button>
     </div>
   </div>
 </div>
